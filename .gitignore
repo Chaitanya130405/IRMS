@@ -1,0 +1,40 @@
+# Dependencies
+node_modules/
+
+# Build artifacts
+dist/
+build/
+out/
+
+# Environment configuration (contains secrets)
+.env
+.env.*
+!.env.example
+
+# Uploaded files (runtime data)
+server/src/uploads/
+
+# VCS / tooling
+.git/
+.svn/
+.vscode/
+.idea/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS generated files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Test coverage
+coverage/
+
+# Lock files (generated)
+package-lock.json
+npm-shrinkwrap.json
+yarn.lock

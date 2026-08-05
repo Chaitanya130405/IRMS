@@ -1,0 +1,10 @@
+import { Router } from "express";
+import * as c from "../controllers/jobController.js";
+import { protect, authorize } from "../middleware/auth.js";
+const r = Router();
+r.get("/", protect, c.listJobs);
+r.get("/:id", protect, c.getJob);
+r.post("/", protect, authorize("admin"), c.createJob);
+r.patch("/:id", protect, authorize("admin"), c.updateJob);
+r.delete("/:id", protect, authorize("admin"), c.deleteJob);
+export default r;
