@@ -19,8 +19,13 @@ Protected APIs use `Authorization: Bearer <JWT>`. Key routes: `/api/auth`, `/api
 .env file :
 
 PORT=5000
+
 NODE_ENV=development
+
 MONGODB_URI=mongodb+srv://2200032338cseh_db_user:Chaitu%40123@cluster0.wpfbd2n.mongodb.net/referral_management?retryWrites=true&w=majority&appName=Cluster0
+
 JWT_SECRET=referflow_9d5a7e2c1b8f4a6d3e0c7b9f2a5d8e1c
+
 JWT_EXPIRES_IN=7d
+
 CLIENT_URL=http://localhost:5173
