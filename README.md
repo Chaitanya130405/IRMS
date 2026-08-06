@@ -16,6 +16,11 @@ Protected APIs use `Authorization: Bearer <JWT>`. Key routes: `/api/auth`, `/api
 
 
 
+
+
+
+
+
 .env file :
 
 PORT=5000
