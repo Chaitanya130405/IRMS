@@ -25,7 +25,11 @@ export function Dashboard({ admin = false }) {
         ["Interviews", d.interviews],
       ];
   return (
-    <>
+    <div className="dashboard">
+      <div className="dashboard-intro">
+        <div><p className="dashboard-kicker">{admin ? "HR OVERVIEW" : "YOUR RECRUITMENT HUB"}</p><h2>{admin ? "Talent pipeline at a glance" : "Keep your opportunities moving"}</h2><p>{admin ? "Monitor applications, hiring activity, and open roles from one place." : "Track each referral application and stay prepared for every next step."}</p></div>
+        <div className="dashboard-orb"><span>{admin ? "HR" : "IS"}</span></div>
+      </div>
       <div className="cards">
         {cards.map(([x, y]) => (
           <article className="card" key={x}>
@@ -34,8 +38,8 @@ export function Dashboard({ admin = false }) {
           </article>
         ))}
       </div>
-      <section className="panel">
-        <h2>Recent activity</h2>
+      <section className="panel dashboard-activity">
+        <div className="section-heading"><div><p>LIVE UPDATES</p><h2>Recent activity</h2></div><span>Updated just now</span></div>
         {d.recent.length ? (
           <table>
             <thead>
@@ -63,7 +67,7 @@ export function Dashboard({ admin = false }) {
           <p>No activity yet.</p>
         )}
       </section>
-    </>
+    </div>
   );
 }
 
