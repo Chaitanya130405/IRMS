@@ -37,7 +37,7 @@ export const createApplication = asyncHandler(async (req, res) => {
       },
     ],
   });
-  const admins = await User.find({ role: "admin" });
+  const admins = await User.find({ role: "admin", status: "active" });
   await Promise.all(
     admins.map((a) =>
       notify(
@@ -46,6 +46,11 @@ export const createApplication = asyncHandler(async (req, res) => {
         `${req.user.name} applied for a job.`,
       ),
     ),
+  );
+  await notify(
+    req.user.id,
+    "Application submitted",
+    "Your referral application has been submitted successfully.",
   );
   res
     .status(201)
@@ -69,15 +74,15 @@ export const listApplications = asyncHandler(async (req, res) => {
   const all = await query;
   let rows = all.filter(
     (a) =>
-      (!department || a.job.department === department) &&
-      (!location || a.job.location === location) &&
+      (!department || a.job?.department === department) &&
+      (!location || a.job?.location === location) &&
       (!search ||
         q.$or ||
         [
-          a.candidate.name,
-          a.candidate.email,
-          a.job.title,
-          a.referral.employeeId,
+          a.candidate?.name,
+          a.candidate?.email,
+          a.job?.title,
+          a.referral?.employeeId,
         ].some((v) => v?.match(new RegExp(search, "i")))),
   );
   const total = rows.length;
@@ -94,7 +99,7 @@ export const getApplication = asyncHandler(async (req, res) => {
   if (!app) throw new AppError("Application not found", 404);
   if (
     req.user.role === "candidate" &&
-    String(app.candidate._id) !== String(req.user.id)
+    String(app.candidate?._id) !== String(req.user.id)
   )
     throw new AppError("Access denied", 403);
   res.json({ application: app });
@@ -104,6 +109,21 @@ export const updateStatus = asyncHandler(async (req, res) => {
   if (!app) throw new AppError("Application not found", 404);
   const { status, remarks, internalNotes } = req.body;
   if (!status) throw new AppError("Status is required");
+  if (
+    ![
+      "Applied",
+      "Resume Under Review",
+      "Interview Scheduled",
+      "Technical Round",
+      "HR Round",
+      "Selected",
+      "Rejected",
+      "Offer Released",
+      "Joined",
+      "Withdrawn",
+    ].includes(status)
+  )
+    throw new AppError("Invalid application status");
   app.status = status;
   app.hrRemarks = remarks ?? app.hrRemarks;
   app.internalNotes = internalNotes ?? app.internalNotes;

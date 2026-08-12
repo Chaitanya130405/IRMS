@@ -73,7 +73,9 @@ export function Dashboard({ admin = false }) {
 
 export function Profile(){const {user,setUser}=useAuth(),[f,setF]=useState({name:user.name,phone:user.phone||''}),[message,setMessage]=useState('');return <section className="panel profile-panel"><div className="profile-heading"><div className="profile-monogram">{user.name[0]}</div><div><h2>Profile settings</h2><p>Manage your account information.</p></div></div><form onSubmit={async e=>{e.preventDefault();const r=await api.patch('/profile',f);setUser(r.data.user);setMessage('Profile updated')}}><label>Name<input value={f.name} onChange={e=>setF({...f,name:e.target.value})}/></label><label>Email<input value={user.email} disabled/></label><label>Phone<input value={f.phone} onChange={e=>setF({...f,phone:e.target.value})}/></label><div className="profile-actions"><button>Save changes</button>{message&&<p className="success">{message}</p>}</div></form></section>}
 export function Notifications(){const [rows,setRows]=useState([]);useEffect(()=>{api.get('/notifications').then(r=>setRows(r.data.notifications))},[]);return <section className="panel"><h2>Notifications</h2>{rows.map(n=><article className={`notification ${n.read?'':'unread'}`} key={n._id}><strong>{n.title}</strong><p>{n.message}</p><small>{new Date(n.createdAt).toLocaleString()}</small></article>)}{!rows.length&&<p>No notifications yet.</p>}</section>}
-export function ApplicationDetails(){const id=location.pathname.split('/').pop(),{user}=useAuth(),[app,setApp]=useState(null),[status,setStatus]=useState('');useEffect(()=>{api.get(`/applications/${id}`).then(r=>{setApp(r.data.application);setStatus(r.data.application.status)})},[id]);if(!app)return <div className="center">Loading application...</div>;return <section className="panel"><div className="page-actions"><div><h2>{app.applicationId}</h2><p>{app.job.title} - {app.job.department}</p></div><span className={statusClass(app.status)}>{app.status}</span></div><div className="form-grid"><div><h3>Candidate</h3><p>{app.candidate.name}<br/>{app.candidate.email}<br/>{app.candidate.phone}</p><h3>Referral</h3><p>{app.referral.employeeName} ({app.referral.employeeId})<br/>{app.referral.employeeEmail}</p></div><div><h3>Resume</h3>{app.resume?.path&&<a className="button" href={`${import.meta.env.VITE_API_URL?.replace('/api','')||'http://localhost:5000'}/uploads/${app.resume.path}`} target="_blank">Download resume</a>}<h3>Status history</h3>{app.statusHistory.map((h,i)=><p key={i}><b>{h.status}</b> - {h.remarks}</p>)}{user.role==='admin'&&<><select value={status} onChange={e=>setStatus(e.target.value)}>{['Applied','Resume Under Review','Interview Scheduled','Technical Round','HR Round','Selected','Rejected','Offer Released','Joined'].map(s=><option key={s}>{s}</option>)}</select><button onClick={async()=>{const r=await api.patch(`/applications/${id}/status`,{status,remarks:'Updated from HR portal'});setApp(r.data.application)}}>Update status</button></>}</div></div></section>}
+export function UserManagement(){const [users,setUsers]=useState([]),[error,setError]=useState(''),[updating,setUpdating]=useState('');const load=()=>api.get('/users').then(r=>setUsers(r.data.users)).catch(e=>setError(e.response?.data?.message||'Could not load HR admins'));useEffect(()=>{load()},[]);const changeStatus=async(user)=>{setUpdating(user._id);setError('');try{const status=user.status==='active'?'inactive':'active';const r=await api.patch(`/users/${user._id}/status`,{status});setUsers(users.map(u=>u._id===user._id?{...u,...r.data.user,_id:u._id}:u))}catch(e){setError(e.response?.data?.message||'Could not update account')}finally{setUpdating('')}};const date=(value)=>value?new Date(value).toLocaleString():'Never';return <section className="panel"><div className="page-actions"><div><h2>HR admin monitoring</h2><p>Review access and activity for every HR administrator.</p></div></div>{error&&<p className="error">{error}</p>}<table><thead><tr><th>Name</th><th>Email</th><th>Status</th><th>Last sign-in</th><th>Jobs</th><th>HR actions</th><th>Action</th></tr></thead><tbody>{users.map(u=><tr key={u._id}><td>{u.name}<small>{new Date(u.createdAt).toLocaleDateString()}</small></td><td>{u.email}</td><td><span className={`badge ${u.status==='active'?'selected':'rejected'}`}>{u.status}</span></td><td>{date(u.lastLogin)}</td><td>{u.jobsCreated}</td><td>{u.actionsTaken}<small>{date(u.lastActivity)}</small></td><td><button disabled={updating===u._id} onClick={()=>changeStatus(u)}>{updating===u._id?'Updating...':u.status==='active'?'Deactivate':'Activate'}</button></td></tr>)}</tbody></table>{!users.length&&!error&&<p>No HR admin accounts found.</p>}</section>}
+export function CreateAdmin(){const [form,setForm]=useState({name:'',email:'',phone:'',password:''}),[message,setMessage]=useState(''),[error,setError]=useState('');const submit=async(e)=>{e.preventDefault();setError('');setMessage('');try{await api.post('/users/admins',form);setForm({name:'',email:'',phone:'',password:''});setMessage('HR admin created. Activate the account from HR Admins before sign-in.')}catch(e){setError(e.response?.data?.message||'Could not create HR admin')}};return <section className="panel"><div className="page-actions"><div><h2>Create HR admin</h2><p>New HR admin accounts require Super Admin approval before they can sign in.</p></div></div><form className="form-grid" onSubmit={submit}><label>Full name<input required value={form.name} onChange={e=>setForm({...form,name:e.target.value})}/></label><label>Email<input required type="email" value={form.email} onChange={e=>setForm({...form,email:e.target.value})}/></label><label>Phone<input value={form.phone} onChange={e=>setForm({...form,phone:e.target.value})}/></label><label>Password<input required minLength="8" type="password" value={form.password} onChange={e=>setForm({...form,password:e.target.value})}/></label><div><button>Create HR admin</button></div></form>{message&&<p className="success">{message}</p>}{error&&<p className="error">{error}</p>}</section>}
+export function ApplicationDetails(){const id=location.pathname.split('/').pop(),{user}=useAuth(),[app,setApp]=useState(null),[status,setStatus]=useState('');useEffect(()=>{api.get(`/applications/${id}`).then(r=>{setApp(r.data.application);setStatus(r.data.application.status)})},[id]);if(!app)return <div className="center">Loading application...</div>;return <section className="panel"><div className="page-actions"><div><h2>{app.applicationId}</h2><p>{app.job?.title || "Job unavailable"} - {app.job?.department || "Department unavailable"}</p></div><span className={statusClass(app.status)}>{app.status}</span></div><div className="form-grid"><div><h3>Candidate</h3><p>{app.candidate?.name || "Candidate unavailable"}<br/>{app.candidate?.email || "No email available"}<br/>{app.candidate?.phone || "No phone available"}</p><h3>Referral</h3><p>{app.referral?.employeeName || "Referral unavailable"} ({app.referral?.employeeId || "No ID"})<br/>{app.referral?.employeeEmail || "No email available"}</p></div><div><h3>Resume</h3>{app.resume?.path&&<a className="button" href={`${import.meta.env.VITE_API_URL?.replace('/api','')||'http://localhost:5000'}/uploads/${app.resume.path}`} target="_blank">Download resume</a>}<h3>Status history</h3>{app.statusHistory?.map((h,i)=><p key={i}><b>{h.status}</b> - {h.remarks}</p>)}{user.role==='admin'&&<><select value={status} onChange={e=>setStatus(e.target.value)}>{['Applied','Resume Under Review','Interview Scheduled','Technical Round','HR Round','Selected','Rejected','Offer Released','Joined'].map(s=><option key={s}>{s}</option>)}</select><button onClick={async()=>{const r=await api.patch(`/applications/${id}/status`,{status,remarks:'Updated from HR portal'});setApp(r.data.application)}}>Update status</button></>}</div></div></section>}
 export function AccessDenied(){return <div className="center"><h1>Access denied</h1><p>You don’t have permission to view this page.</p><Link to="/dashboard">Return to dashboard</Link></div>}
 export function Jobs({ admin = false }) {
   const [jobs, setJobs] = useState([]),
@@ -213,6 +215,7 @@ export function Apply() {
     [jobs, setJobs] = useState([]),
     [file, setFile] = useState(),
     [msg, setMsg] = useState(""),
+    [submitting, setSubmitting] = useState(false),
     [f, setF] = useState({
       job: "",
       employeeName: "",
@@ -230,6 +233,9 @@ export function Apply() {
   const set = (k, v) => setF({ ...f, [k]: v });
   const submit = async (e) => {
     e.preventDefault();
+    if (submitting) return;
+    setSubmitting(true);
+    setMsg("");
     const d = new FormData();
     d.append("job", f.job);
     d.append("resume", file);
@@ -250,6 +256,8 @@ export function Apply() {
       nav("/applications");
     } catch (e) {
       setMsg(e.response?.data?.message || "Submission failed");
+    } finally {
+      setSubmitting(false);
     }
   };
   return (
@@ -305,11 +313,16 @@ export function Apply() {
           />
         </label>
         <label className="check">
-          <input required type="checkbox" /> I declare that this information is
-          accurate.
+          <input required type="checkbox" />
+          <span>
+            <strong>Declaration</strong>
+            <span>I confirm that the information provided is accurate.</span>
+          </span>
         </label>
         <div>
-          <button>Submit application</button>
+          <button disabled={submitting}>
+            {submitting ? "Submitting..." : "Submit application"}
+          </button>
         </div>
         {msg && <p className="error">{msg}</p>}
       </form>
@@ -371,11 +384,11 @@ export function Applications({ admin = false }) {
           {rows.map((a) => (
             <tr key={a._id}>
               <td>
-                {a.candidate.name}
-                <small>{a.candidate.email}</small>
+                {a.candidate?.name || "Candidate unavailable"}
+                <small>{a.candidate?.email || "No email available"}</small>
               </td>
-              <td>{a.job.title}</td>
-              <td>{a.referral.employeeName}</td>
+              <td>{a.job?.title || "Job unavailable"}</td>
+              <td>{a.referral?.employeeName || "Referral unavailable"}</td>
               <td>
                 <span className={statusClass(a.status)}>{a.status}</span>
               </td>

@@ -30,6 +30,10 @@ export const login = asyncHandler(async (req, res) => {
   const user = await User.findOne({ email }).select("+password");
   if (!user || !(await user.comparePassword(password)))
     throw new AppError("Invalid email or password", 401);
+  if (user.status !== "active")
+    throw new AppError("Account unavailable", 401);
+  user.lastLogin = new Date();
+  await user.save();
   respond(user, res);
 });
 export const me = asyncHandler(async (req, res) =>

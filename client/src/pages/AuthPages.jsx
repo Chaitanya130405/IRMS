@@ -12,7 +12,7 @@ export function Login() {
     e.preventDefault();
     try {
       const u = await login(form);
-      nav(u.role === "admin" ? "/admin" : "/dashboard", { replace: true });
+      nav(u.role === "superadmin" ? "/superadmin" : u.role === "admin" ? "/admin" : "/dashboard", { replace: true });
     } catch (e) {
       setError(e.response?.data?.message || "Unable to sign in");
     }
