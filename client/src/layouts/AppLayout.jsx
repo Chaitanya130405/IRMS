@@ -26,8 +26,8 @@ export default function AppLayout() {
   const nav = useNavigate();
   const links = user.role === "superadmin" ? superadmin : user.role === "admin" ? admin : candidate;
   return (
-    <div className="grid min-h-screen grid-cols-1 lg:grid-cols-[260px_minmax(0,1fr)]">
-      <aside className="flex flex-col border-r border-white/10 bg-[linear-gradient(180deg,#052c60_0%,#041b3e_100%)] px-4 py-7 shadow-[8px_0_30px_rgba(4,31,69,.12)] max-lg:block max-lg:p-[13px]">
+    <div className="grid min-h-screen grid-cols-1 lg:h-screen lg:min-h-0 lg:grid-cols-[260px_minmax(0,1fr)] lg:overflow-hidden">
+      <aside className="flex flex-col border-r border-white/10 bg-[linear-gradient(180deg,#052c60_0%,#041b3e_100%)] px-4 py-7 shadow-[8px_0_30px_rgba(4,31,69,.12)] lg:h-screen lg:overflow-y-auto max-lg:block max-lg:p-[13px]">
         <div className="mb-2.5 flex items-center gap-2.5 px-[11px] text-2xl font-extrabold text-white max-lg:hidden">
           <img className="h-9 w-9 rounded-[10px] bg-white object-contain" src={logo} alt="iSpace IRMS" />
           <span className="whitespace-nowrap">i<span className="text-[#75bfff]">Space</span></span>
@@ -61,8 +61,8 @@ export default function AppLayout() {
           Sign out
         </button>
       </aside>
-      <main className="min-w-0 px-[17px] pb-[25px] md:px-[38px] md:pb-[38px]">
-        <header className="mb-5 flex items-center justify-between border-b border-[#e7edf5] py-[19px] md:mb-7 md:py-7 md:pb-[26px]">
+      <main className="min-w-0 px-[17px] pb-[25px] md:px-[38px] md:pb-[38px] lg:h-screen lg:min-h-0 lg:overflow-x-hidden lg:overflow-y-auto">
+        <header className="mb-5 flex items-center justify-between border-b border-[#e7edf5] bg-[#f4f8fc] py-[19px] md:mb-7 md:py-7 md:pb-[26px]">
           <div>
             <h1 className="m-0 text-[25px] font-bold tracking-[-.7px]">Welcome, {user.name.split(" ")[0]}</h1>
             <p className="mb-0 mt-[5px] font-medium text-[#6c7a90]">iSpace Recruitment Management System</p>

@@ -70,7 +70,7 @@ export const listApplications = asyncHandler(async (req, res) => {
   const q = req.user.role === "candidate" ? { candidate: req.user.id } : {};
   if (status) q.status = status;
   if (search) q.$or = [{ applicationId: new RegExp(search, "i") }];
-  const query = populated(Application.find(q));
+  const query = populated(Application.find(q).sort("-createdAt"));
   const all = await query;
   let rows = all.filter(
     (a) =>
