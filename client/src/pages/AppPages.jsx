@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import api from "../services/api";
 import { useAuth } from "../context/AuthContext";
 const statusClass = (s) => `badge ${s?.toLowerCase().replaceAll(" ", "-")}`;
@@ -21,25 +21,31 @@ function Pagination({ page, pages, total, onChange }) {
   return <div className="pagination"><span>Page {page} of {pages} · {total} results</span><div><button type="button" aria-label="Previous page" onClick={() => onChange(page - 1)} disabled={page === 1}>←</button>{numbers.map((number, index) => <React.Fragment key={number}>{index > 0 && numbers[index - 1] !== number - 1 && <i>…</i>}<button type="button" className={number === page ? 'active' : ''} onClick={() => onChange(number)}>{number}</button></React.Fragment>)}<button type="button" aria-label="Next page" onClick={() => onChange(page + 1)} disabled={page === pages}>→</button></div></div>;
 }
 export function Dashboard({ admin = false }) {
-  const [d, setD] = useState(null), [exporting, setExporting] = useState(false), [exportError, setExportError] = useState("");
+  const [d, setD] = useState(null), [loadError, setLoadError] = useState(""), [exporting, setExporting] = useState(false), [exportError, setExportError] = useState("");
+  const loadDashboard = () => {
+    setLoadError("");
+    api.get("/dashboard").then((r) => setD(r.data)).catch((error) => setLoadError(error.response?.data?.message || "Could not load the dashboard."));
+  };
   useEffect(() => {
-    api.get("/dashboard").then((r) => setD(r.data));
+    loadDashboard();
   }, []);
+  if (loadError) return <div className="center"><p>{loadError}</p><button type="button" onClick={loadDashboard}>Try again</button></div>;
   if (!d) return <div className="center">Loading dashboard…</div>;
+  const applicationPath = admin ? "/admin/applications" : "/applications";
   const cards = admin
     ? [
-        ["Candidates", d.totalCandidates],
-        ["Applications", d.totalApplications],
-        ["Today", d.today],
-        ["Pending", d.pending],
-        ["Active jobs", d.activeJobs],
-        ["Interviews", d.interviews],
+        ["Candidates", d.totalCandidates, "/admin/insights/candidates"],
+        ["Applications", d.totalApplications, "/admin/insights/applications"],
+        ["Today", d.today, "/admin/insights/today"],
+        ["Pending", d.pending, "/admin/insights/pending"],
+        ["Active jobs", d.activeJobs, "/admin/insights/active-jobs"],
+        ["Interviews", d.interviews, "/admin/insights/interviews"],
       ]
     : [
-        ["Applications", d.totalApplications],
-        ["Pending", d.pending],
-        ["Rejected", d.rejected],
-        ["Interviews", d.interviews],
+        ["Applications", d.totalApplications, applicationPath],
+        ["Pending", d.pending, `${applicationPath}?group=pending`],
+        ["Rejected", d.rejected, `${applicationPath}?status=Rejected`],
+        ["Interviews", d.interviews, `${applicationPath}?status=Interview%20Scheduled`],
       ];
   const exportDetails = async () => {
     setExporting(true);
@@ -87,11 +93,12 @@ export function Dashboard({ admin = false }) {
         <div className="dashboard-orb"><span>{admin ? "HR" : "IS"}</span></div>
       </div>
       <div className="cards">
-        {cards.map(([x, y]) => (
-          <article className="card" key={x}>
+        {cards.map(([x, y, to]) => (
+          <Link className="card dashboard-card" to={to} key={x}>
             <small>{x}</small>
             <strong>{y}</strong>
-          </article>
+            <span>View details →</span>
+          </Link>
         ))}
       </div>
       <section className="panel dashboard-activity">
@@ -130,6 +137,28 @@ export function Dashboard({ admin = false }) {
 
 export function Profile(){const {user,setUser}=useAuth(),[f,setF]=useState({name:user.name,phone:user.phone||''}),[message,setMessage]=useState('');return <section className="panel profile-panel"><div className="profile-heading"><div className="profile-monogram">{user.name[0]}</div><div><h2>Profile settings</h2><p>Manage your account information.</p></div></div><form onSubmit={async e=>{e.preventDefault();const r=await api.patch('/profile',f);setUser(r.data.user);setMessage('Profile updated')}}><label>Name<input value={f.name} onChange={e=>setF({...f,name:e.target.value})}/></label><label>Email<input value={user.email} disabled/></label><label>Phone<input value={f.phone} onChange={e=>setF({...f,phone:e.target.value})}/></label><div className="profile-actions"><button>Save changes</button>{message&&<p className="success">{message}</p>}</div></form></section>}
 export function Notifications(){const [rows,setRows]=useState([]),[page,setPage]=useState(1);useEffect(()=>{api.get('/notifications').then(r=>setRows(r.data.notifications))},[]);const pages=Math.ceil(rows.length/PAGE_SIZE),shown=rows.slice((page-1)*PAGE_SIZE,page*PAGE_SIZE);return <section className="panel"><h2>Notifications</h2>{shown.map(n=><article className={`notification ${n.read?'':'unread'}`} key={n._id}><strong>{n.title}</strong><p>{n.message}</p><small>{new Date(n.createdAt).toLocaleString()}</small></article>)}{!rows.length&&<p>No notifications yet.</p>}<Pagination page={page} pages={pages} total={rows.length} onChange={setPage}/></section>}
+export function Candidates() {
+  const [rows, setRows] = useState([]);
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [meta, setMeta] = useState({ total: 0, pages: 0 });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const load = async (pageToLoad = page) => {
+    setLoading(true); setError("");
+    try {
+      const { data } = await api.get("/candidates", { params: { search, page: pageToLoad, limit: PAGE_SIZE } });
+      setRows(data.candidates); setMeta({ total: data.total, pages: data.pages });
+    } catch (requestError) { setError(requestError.response?.data?.message || "Could not load candidates."); }
+    finally { setLoading(false); }
+  };
+  useEffect(() => { load(); }, [page]);
+  return <section className="panel">
+    <div className="page-actions"><div><h2>Candidates</h2><p>Review registered candidates and their contact details.</p></div><div><input value={search} placeholder="Search candidates" onChange={(event) => setSearch(event.target.value)} /><button type="button" onClick={() => { setPage(1); load(1); }}>Search</button></div></div>
+    {error && <p className="error">{error}</p>}
+    {loading ? <p className="table-state">Loading candidates…</p> : <><table><thead><tr><th>Candidate</th><th>Phone</th><th>Account status</th><th>Joined</th><th>Last sign-in</th></tr></thead><tbody>{rows.map((candidate) => <tr key={candidate._id}><td>{candidate.name}<small>{candidate.email}</small></td><td>{candidate.phone || "Not provided"}</td><td><span className={`badge ${candidate.status === "active" ? "selected" : "rejected"}`}>{candidate.status}</span></td><td>{new Date(candidate.createdAt).toLocaleDateString()}</td><td>{candidate.lastLogin ? new Date(candidate.lastLogin).toLocaleDateString() : "Never"}</td></tr>)}</tbody></table>{!rows.length && <p className="table-state">No candidates found.</p>}<Pagination page={page} pages={meta.pages} total={meta.total} onChange={setPage}/></>}
+  </section>;
+}
 export function UserManagement(){const [users,setUsers]=useState([]),[error,setError]=useState(''),[updating,setUpdating]=useState(''),[page,setPage]=useState(1);const load=()=>api.get('/users').then(r=>setUsers(r.data.users)).catch(e=>setError(e.response?.data?.message||'Could not load HR admins'));useEffect(()=>{load()},[]);const changeStatus=async(user)=>{setUpdating(user._id);setError('');try{const status=user.status==='active'?'inactive':'active';const r=await api.patch(`/users/${user._id}/status`,{status});setUsers(users.map(u=>u._id===user._id?{...u,...r.data.user,_id:u._id}:u))}catch(e){setError(e.response?.data?.message||'Could not update account')}finally{setUpdating('')}};const date=(value)=>value?new Date(value).toLocaleString():'Never',pages=Math.ceil(users.length/PAGE_SIZE),shown=users.slice((page-1)*PAGE_SIZE,page*PAGE_SIZE);return <section className="panel"><div className="page-actions"><div><h2>HR admin monitoring</h2><p>Review access and activity for every HR administrator.</p></div></div>{error&&<p className="error">{error}</p>}<table><thead><tr><th>Name</th><th>Email</th><th>Status</th><th>Last sign-in</th><th>Jobs</th><th>HR actions</th><th>Action</th></tr></thead><tbody>{shown.map(u=><tr key={u._id}><td>{u.name}<small>{new Date(u.createdAt).toLocaleDateString()}</small></td><td>{u.email}</td><td><span className={`badge ${u.status==='active'?'selected':'rejected'}`}>{u.status}</span></td><td>{date(u.lastLogin)}</td><td>{u.jobsCreated}</td><td>{u.actionsTaken}<small>{date(u.lastActivity)}</small></td><td><button disabled={updating===u._id} onClick={()=>changeStatus(u)}>{updating===u._id?'Updating...':u.status==='active'?'Deactivate':'Activate'}</button></td></tr>)}</tbody></table>{!users.length&&!error&&<p>No HR admin accounts found.</p>}<Pagination page={page} pages={pages} total={users.length} onChange={setPage}/></section>}
 export function CreateAdmin(){const [form,setForm]=useState({name:'',email:'',phone:'',password:''}),[message,setMessage]=useState(''),[error,setError]=useState('');const submit=async(e)=>{e.preventDefault();setError('');setMessage('');try{await api.post('/users/admins',form);setForm({name:'',email:'',phone:'',password:''});setMessage('HR admin created. Activate the account from HR Admins before sign-in.')}catch(e){setError(e.response?.data?.message||'Could not create HR admin')}};return <section className="panel"><div className="page-actions"><div><h2>Create HR admin</h2><p>New HR admin accounts require Super Admin approval before they can sign in.</p></div></div><form className="form-grid" onSubmit={submit}><label>Full name<input required value={form.name} onChange={e=>setForm({...form,name:e.target.value})}/></label><label>Email<input required type="email" value={form.email} onChange={e=>setForm({...form,email:e.target.value})}/></label><label>Phone<input value={form.phone} onChange={e=>setForm({...form,phone:e.target.value})}/></label><label>Password<input required minLength="8" type="password" value={form.password} onChange={e=>setForm({...form,password:e.target.value})}/></label><div><button>Create HR admin</button></div></form>{message&&<p className="success">{message}</p>}{error&&<p className="error">{error}</p>}</section>}
 export function ApplicationDetails() {
@@ -188,7 +217,9 @@ export function ApplicationDetails() {
   </section>
 }
 export function AccessDenied(){return <div className="center"><h1>Access denied</h1><p>You don’t have permission to view this page.</p><Link to="/dashboard">Return to dashboard</Link></div>}
-export function Jobs({ admin = false }) {
+export function Jobs({ admin = false, onlyActive = false }) {
+  const location = useLocation();
+  const requestedStatus = new URLSearchParams(location.search).get("status");
   const [jobs, setJobs] = useState([]),
     [form, setForm] = useState(null),
     [error, setError] = useState(""),
@@ -276,7 +307,7 @@ export function Jobs({ admin = false }) {
         </form>
       </section>
     );
-  const visibleJobs = jobs.filter((j) => admin || j.status === "active");
+  const visibleJobs = jobs.filter((j) => (admin || j.status === "active") && (!requestedStatus || j.status === requestedStatus) && (!onlyActive || j.status === "active"));
   const pages = Math.ceil(visibleJobs.length / PAGE_SIZE);
   const shownJobs = visibleJobs.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
   return (
@@ -284,7 +315,7 @@ export function Jobs({ admin = false }) {
       <div className="page-actions">
         <div>
           <h2>{admin ? "Manage Jobs" : "Open Positions"}</h2>
-          <p>Explore roles and referral opportunities.</p>
+          <p>{requestedStatus === "active" || onlyActive ? "Showing active roles." : "Explore roles and referral opportunities."}</p>
         </div>
         {admin && <button onClick={() => setForm({})}>Create job</button>}
       </div>
@@ -444,24 +475,38 @@ export function Apply() {
     </section>
   );
 }
-export function Applications({ admin = false }) {
+export function Applications({ admin = false, insight }) {
+  const location = useLocation();
+  const query = new URLSearchParams(location.search);
+  const insights = {
+    candidates: { title: "Candidates", description: "Candidate applications and contact details." },
+    applications: { title: "All Applications", description: "Every application in the hiring pipeline." },
+    today: { title: "Today's Applications", description: "Applications submitted today.", period: "today" },
+    pending: { title: "Pending Applications", description: "Applications awaiting a hiring decision.", group: "pending" },
+    interviews: { title: "Interview Applications", description: "Candidates with an interview scheduled.", status: "Interview Scheduled" },
+  };
+  const activeInsight = insights[insight];
   const [rows, setRows] = useState([]),
-    [status, setStatus] = useState(""),
+    [status, setStatus] = useState(activeInsight?.status || query.get("status") || ""),
     [search, setSearch] = useState(""),
     [page, setPage] = useState(1),
     [total, setTotal] = useState(0),
     [pages, setPages] = useState(0);
   const load = (pageToLoad = page) =>
     api
-      .get("/applications", { params: { status, search, page: pageToLoad, limit: PAGE_SIZE } })
+      .get("/applications", { params: { status, search, period: activeInsight?.period || query.get("period") || "", group: activeInsight?.group || query.get("group") || "", page: pageToLoad, limit: PAGE_SIZE } })
       .then((r) => { setRows(r.data.applications); setTotal(r.data.total); setPages(r.data.pages); });
   useEffect(() => {
+    setStatus(activeInsight?.status || query.get("status") || "");
+    setPage(1);
+  }, [location.search, insight]);
+  useEffect(() => {
     load();
-  }, [status, page]);
+  }, [status, page, location.search]);
   return (
     <section className="panel">
       <div className="page-actions">
-        <h2>{admin ? "All Applications" : "My Applications"}</h2>
+        <div><h2>{activeInsight?.title || (admin ? "All Applications" : "My Applications")}</h2>{activeInsight?.description && <p>{activeInsight.description}</p>}{query.get("period") === "today" && <p>Applications submitted today</p>}{query.get("group") === "pending" && <p>Applications awaiting a hiring decision</p>}{query.get("view") === "candidates" && <p>Candidate applications and contact details</p>}</div>
         <div>
           <input
             placeholder="Search"

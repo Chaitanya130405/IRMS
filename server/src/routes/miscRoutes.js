@@ -8,6 +8,7 @@ import {
 } from "../controllers/notificationController.js";
 import {
   createAdmin,
+  listCandidates,
   listManagedUsers,
   updateUserStatus,
 } from "../controllers/userController.js";
@@ -18,6 +19,7 @@ r.patch("/profile", updateProfile);
 r.get("/notifications", listNotifications);
 r.patch("/notifications/:id/read", readNotification);
 r.get("/users", authorize("superadmin"), listManagedUsers);
+r.get("/candidates", authorize("admin"), listCandidates);
 r.post("/users/admins", authorize("superadmin"), createAdmin);
 r.patch("/users/:id/status", authorize("superadmin"), updateUserStatus);
 export default r;

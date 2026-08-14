@@ -64,11 +64,19 @@ export const listApplications = asyncHandler(async (req, res) => {
     search,
     department,
     location,
+    period,
+    group,
     page = 1,
     limit = 10,
   } = req.query;
   const q = req.user.role === "candidate" ? { candidate: req.user.id } : {};
   if (status) q.status = status;
+  if (period === "today") {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    q.createdAt = { $gte: today };
+  }
+  if (group === "pending") q.status = { $in: ["Applied", "Resume Under Review", "Technical Round", "HR Round"] };
   if (search) q.$or = [{ applicationId: new RegExp(search, "i") }];
   const query = populated(Application.find(q).sort("-createdAt"));
   const all = await query;

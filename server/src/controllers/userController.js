@@ -37,6 +37,26 @@ export const listManagedUsers = asyncHandler(async (req, res) => {
   });
 });
 
+export const listCandidates = asyncHandler(async (req, res) => {
+  const page = Math.max(Number(req.query.page) || 1, 1);
+  const limit = Math.min(Math.max(Number(req.query.limit) || 10, 1), 100);
+  const search = req.query.search?.trim();
+  const query = { role: "candidate" };
+  if (search) {
+    const match = new RegExp(search, "i");
+    query.$or = [{ name: match }, { email: match }, { phone: match }];
+  }
+  const [total, candidates] = await Promise.all([
+    User.countDocuments(query),
+    User.find(query)
+      .select("name email phone status createdAt lastLogin")
+      .sort("-createdAt")
+      .skip((page - 1) * limit)
+      .limit(limit),
+  ]);
+  res.json({ candidates, total, page, pages: Math.ceil(total / limit) });
+});
+
 export const createAdmin = asyncHandler(async (req, res) => {
   const { name, email, password, phone } = req.body;
   if (!name || !email || !password)
