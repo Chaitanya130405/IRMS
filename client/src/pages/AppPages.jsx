@@ -248,6 +248,8 @@ export function Jobs({ admin = false, onlyActive = false }) {
           {[
             ["jobId", "Job ID"],
             ["title", "Title"],
+            ["clientName", "Client name"],
+            ["projectName", "Project name"],
             ["department", "Department"],
             ["location", "Location"],
             ["description", "Description"],
@@ -324,6 +326,12 @@ export function Jobs({ admin = false, onlyActive = false }) {
             <article className="job" key={j._id}>
               <span>{j.department}</span>
               <h2>{j.title}</h2>
+              {admin && (
+                <div className="mb-4 grid gap-1 text-[12px] font-semibold text-[#39709f]">
+                  <span>Client: {j.clientName || "Not specified"}</span>
+                  <span>Project: {j.projectName || "Not specified"}</span>
+                </div>
+              )}
               <p>
                 {j.location} · {j.employmentType}
               </p>

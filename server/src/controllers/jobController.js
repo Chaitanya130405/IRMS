@@ -11,11 +11,15 @@ export const listJobs = asyncHandler(async (req, res) => {
       { jobId: new RegExp(search, "i") },
       { department: new RegExp(search, "i") },
     ];
-  const jobs = await Job.find(q).sort("-createdAt");
+  const jobs = await Job.find(q)
+    .select(req.user.role === "candidate" ? "-clientName -projectName" : "")
+    .sort("-createdAt");
   res.json({ jobs });
 });
 export const getJob = asyncHandler(async (req, res) => {
-  const job = await Job.findById(req.params.id);
+  const job = await Job.findById(req.params.id).select(
+    req.user.role === "candidate" ? "-clientName -projectName" : "",
+  );
   if (!job) throw new AppError("Job not found", 404);
   res.json({ job });
 });

@@ -6,10 +6,10 @@ import ActivityLog from "../models/ActivityLog.js";
 import AppError from "../utils/AppError.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import { notify } from "../services/notificationService.js";
-const populated = (query) =>
+const populated = (query, includeInternalJobDetails = false) =>
   query
     .populate("candidate", "name email phone profilePicture")
-    .populate("job")
+    .populate("job", includeInternalJobDetails ? undefined : "-clientName -projectName")
     .populate("referral");
 export const createApplication = asyncHandler(async (req, res) => {
   if (!req.file) throw new AppError("Resume is required");
@@ -78,7 +78,10 @@ export const listApplications = asyncHandler(async (req, res) => {
   }
   if (group === "pending") q.status = { $in: ["Applied", "Resume Under Review", "Technical Round", "HR Round"] };
   if (search) q.$or = [{ applicationId: new RegExp(search, "i") }];
-  const query = populated(Application.find(q).sort("-createdAt"));
+  const query = populated(
+    Application.find(q).sort("-createdAt"),
+    req.user.role === "admin",
+  );
   const all = await query;
   let rows = all.filter(
     (a) =>
@@ -103,7 +106,10 @@ export const listApplications = asyncHandler(async (req, res) => {
   });
 });
 export const getApplication = asyncHandler(async (req, res) => {
-  const app = await populated(Application.findById(req.params.id));
+  const app = await populated(
+    Application.findById(req.params.id),
+    req.user.role === "admin",
+  );
   if (!app) throw new AppError("Application not found", 404);
   if (
     req.user.role === "candidate" &&
@@ -148,7 +154,7 @@ export const updateStatus = asyncHandler(async (req, res) => {
     entityType: "Application",
     entityId: app._id,
   });
-  res.json({ application: await populated(Application.findById(app.id)) });
+  res.json({ application: await populated(Application.findById(app.id), true) });
 });
 export const withdraw = asyncHandler(async (req, res) => {
   const app = await Application.findOne({

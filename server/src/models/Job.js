@@ -3,6 +3,8 @@ const jobSchema = new mongoose.Schema(
   {
     jobId: { type: String, required: true, unique: true, trim: true },
     title: { type: String, required: true, trim: true },
+    clientName: { type: String, trim: true },
+    projectName: { type: String, trim: true },
     department: { type: String, required: true },
     description: { type: String, required: true },
     experience: { min: { type: Number, default: 0 }, max: Number },
