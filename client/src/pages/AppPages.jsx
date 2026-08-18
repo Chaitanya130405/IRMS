@@ -21,7 +21,7 @@ function Pagination({ page, pages, total, onChange }) {
   return <div className="pagination"><span>Page {page} of {pages} · {total} results</span><div><button type="button" aria-label="Previous page" onClick={() => onChange(page - 1)} disabled={page === 1}>←</button>{numbers.map((number, index) => <React.Fragment key={number}>{index > 0 && numbers[index - 1] !== number - 1 && <i>…</i>}<button type="button" className={number === page ? 'active' : ''} onClick={() => onChange(number)}>{number}</button></React.Fragment>)}<button type="button" aria-label="Next page" onClick={() => onChange(page + 1)} disabled={page === pages}>→</button></div></div>;
 }
 export function Dashboard({ admin = false }) {
-  const [d, setD] = useState(null), [loadError, setLoadError] = useState(""), [exporting, setExporting] = useState(false), [exportError, setExportError] = useState("");
+  const [d, setD] = useState(null), [loadError, setLoadError] = useState("");
   const loadDashboard = () => {
     setLoadError("");
     api.get("/dashboard").then((r) => setD(r.data)).catch((error) => setLoadError(error.response?.data?.message || "Could not load the dashboard."));
@@ -47,45 +47,6 @@ export function Dashboard({ admin = false }) {
         ["Rejected", d.rejected, `${applicationPath}?status=Rejected`],
         ["Interviews", d.interviews, `${applicationPath}?status=Interview%20Scheduled`],
       ];
-  const exportDetails = async () => {
-    setExporting(true);
-    setExportError("");
-    try {
-      const { data } = await api.get("/applications", { params: { limit: 10000 } });
-      const date = (value) => (value ? new Date(value).toLocaleString() : "");
-      downloadCsv(
-        `hr-application-details-${new Date().toISOString().slice(0, 10)}.csv`,
-        ["Application ID", "Candidate Name", "Candidate Email", "Candidate Phone", "Job ID", "Job Title", "Department", "Location", "Referral Employee", "Referral Employee ID", "Referral Email", "Referral Department", "Relationship", "Status", "HR Remarks", "Internal Notes", "Cover Letter", "Additional Notes", "Resume File", "Created At", "Last Updated"],
-        data.applications.map((application) => [
-          application.applicationId,
-          application.candidate?.name,
-          application.candidate?.email,
-          application.candidate?.phone,
-          application.job?.jobId,
-          application.job?.title,
-          application.job?.department,
-          application.job?.location,
-          application.referral?.employeeName,
-          application.referral?.employeeId,
-          application.referral?.employeeEmail,
-          application.referral?.department,
-          application.referral?.relationship,
-          application.status,
-          application.hrRemarks,
-          application.internalNotes,
-          application.coverLetter,
-          application.additionalNotes,
-          application.resume?.originalName,
-          date(application.createdAt),
-          date(application.updatedAt),
-        ]),
-      );
-    } catch (error) {
-      setExportError(error.response?.data?.message || "Could not export application details");
-    } finally {
-      setExporting(false);
-    }
-  };
   return (
     <div className="dashboard">
       <div className="dashboard-intro">
@@ -102,8 +63,7 @@ export function Dashboard({ admin = false }) {
         ))}
       </div>
       <section className="panel dashboard-activity">
-        <div className="section-heading"><div><p>LIVE UPDATES</p><h2>Recent activity</h2></div>{admin ? <button type="button" onClick={exportDetails} disabled={exporting}>{exporting ? "Exporting..." : "Export details"}</button> : <span>Updated just now</span>}</div>
-        {exportError && <p className="error">{exportError}</p>}
+        <div className="section-heading"><div><p>LIVE UPDATES</p><h2>Recent activity</h2></div><span>Updated just now</span></div>
         {d.recent.length ? (
           <table>
             <thead>
@@ -252,23 +212,14 @@ export function Jobs({ admin = false, onlyActive = false }) {
             ["projectName", "Project name"],
             ["department", "Department"],
             ["location", "Location"],
-            ["description", "Description"],
           ].map(([k, l]) => (
             <label key={k}>
               {l}
-              {k === "description" ? (
-                <textarea
-                  required
-                  value={form[k] || ""}
-                  onChange={(e) => setForm({ ...form, [k]: e.target.value })}
-                />
-              ) : (
-                <input
-                  required
-                  value={form[k] || ""}
-                  onChange={(e) => setForm({ ...form, [k]: e.target.value })}
-                />
-              )}
+              <input
+                required
+                value={form[k] || ""}
+                onChange={(e) => setForm({ ...form, [k]: e.target.value })}
+              />
             </label>
           ))}
           <label>
@@ -499,7 +450,9 @@ export function Applications({ admin = false, insight }) {
     [search, setSearch] = useState(""),
     [page, setPage] = useState(1),
     [total, setTotal] = useState(0),
-    [pages, setPages] = useState(0);
+    [pages, setPages] = useState(0),
+    [exporting, setExporting] = useState(false),
+    [exportError, setExportError] = useState("");
   const load = (pageToLoad = page) =>
     api
       .get("/applications", { params: { status, search, period: activeInsight?.period || query.get("period") || "", group: activeInsight?.group || query.get("group") || "", page: pageToLoad, limit: PAGE_SIZE } })
@@ -511,11 +464,28 @@ export function Applications({ admin = false, insight }) {
   useEffect(() => {
     load();
   }, [status, page, location.search]);
+  const exportDetails = async () => {
+    setExporting(true);
+    setExportError("");
+    try {
+      const { data } = await api.get("/applications", { params: { limit: 10000 } });
+      const date = (value) => (value ? new Date(value).toLocaleString() : "");
+      downloadCsv(
+        `hr-application-details-${new Date().toISOString().slice(0, 10)}.csv`,
+        ["Application ID", "Candidate Name", "Candidate Email", "Candidate Phone", "Job ID", "Job Title", "Department", "Location", "Referral Employee", "Referral Employee ID", "Referral Email", "Referral Department", "Relationship", "Status", "HR Remarks", "Internal Notes", "Cover Letter", "Additional Notes", "Resume File", "Created At", "Last Updated"],
+        data.applications.map((application) => [application.applicationId, application.candidate?.name, application.candidate?.email, application.candidate?.phone, application.job?.jobId, application.job?.title, application.job?.department, application.job?.location, application.referral?.employeeName, application.referral?.employeeId, application.referral?.employeeEmail, application.referral?.department, application.referral?.relationship, application.status, application.hrRemarks, application.internalNotes, application.coverLetter, application.additionalNotes, application.resume?.originalName, date(application.createdAt), date(application.updatedAt)]),
+      );
+    } catch (error) {
+      setExportError(error.response?.data?.message || "Could not export application details");
+    } finally {
+      setExporting(false);
+    }
+  };
   return (
     <section className="panel">
       <div className="page-actions">
         <div><h2>{activeInsight?.title || (admin ? "All Applications" : "My Applications")}</h2>{activeInsight?.description && <p>{activeInsight.description}</p>}{query.get("period") === "today" && <p>Applications submitted today</p>}{query.get("group") === "pending" && <p>Applications awaiting a hiring decision</p>}{query.get("view") === "candidates" && <p>Candidate applications and contact details</p>}</div>
-        <div>
+        <div className="application-page-controls">
           <input
             placeholder="Search"
             value={search}
@@ -539,8 +509,10 @@ export function Applications({ admin = false, insight }) {
             ))}
           </select>
           <button onClick={() => { setPage(1); load(1); }}>Search</button>
+          {admin && <button type="button" onClick={exportDetails} disabled={exporting}>{exporting ? "Exporting..." : "Export details"}</button>}
         </div>
       </div>
+      {exportError && <p className="error">{exportError}</p>}
       <table>
         <thead>
           <tr>

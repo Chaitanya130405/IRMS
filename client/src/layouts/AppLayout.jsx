@@ -1,5 +1,4 @@
-import React from "react";
-import logo from "../../images/logo.png";
+import React, { useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 const candidate = [
@@ -24,22 +23,23 @@ const superadmin = [
 export default function AppLayout() {
   const { user, logout } = useAuth();
   const nav = useNavigate();
+  const [menuOpen, setMenuOpen] = useState(false);
   const links = user.role === "superadmin" ? superadmin : user.role === "admin" ? admin : candidate;
   return (
-    <div className="app-shell grid min-h-screen grid-cols-1 lg:h-screen lg:min-h-0 lg:grid-cols-[260px_minmax(0,1fr)] lg:overflow-hidden">
-      <aside className="app-sidebar flex flex-col border-r border-white/10 bg-[linear-gradient(180deg,#052c60_0%,#041b3e_100%)] px-4 py-7 shadow-[8px_0_30px_rgba(4,31,69,.12)] lg:h-screen lg:overflow-y-auto max-lg:block max-lg:p-[13px]">
-        <div className="mb-2.5 flex items-center gap-2.5 px-[11px] text-2xl font-extrabold text-white max-lg:hidden">
-          <img className="h-9 w-9 rounded-[10px] bg-white object-contain" src={logo} alt="iSpace IRMS" />
-          <span className="whitespace-nowrap">i<span className="text-[#75bfff]">Space</span></span>
+    <div className={`app-shell min-h-screen ${menuOpen ? "menu-open" : ""}`}>
+      <aside className={`app-sidebar flex flex-col border-r border-white/10 bg-[linear-gradient(180deg,#052c60_0%,#041b3e_100%)] px-4 py-7 shadow-[8px_0_30px_rgba(4,31,69,.12)] ${menuOpen ? "menu-open" : ""}`}>
+        <button type="button" className="sidebar-close" aria-label="Close navigation menu" onClick={() => setMenuOpen(false)}>✕</button>
+        <div className="app-brand">
+          <span>i<span>Space</span></span>
         </div>
-        <p className="mx-3 mb-7 mt-[5px] text-[10px] font-extrabold tracking-[1.6px] text-[#75bfff] max-lg:hidden">
+        <p className="mx-3 mb-7 mt-[5px] text-[10px] font-extrabold tracking-[1.6px] text-[#75bfff]">
           {user.role === "superadmin" ? "SUPER ADMIN" : user.role === "admin" ? "HR ADMIN" : "CANDIDATE"}
         </p>
-        <div className="mb-7 flex items-center gap-3 rounded-xl border border-white/10 bg-white/[.07] p-3 max-lg:hidden">
+        <div className="mb-7 flex items-center gap-3 rounded-xl border border-white/10 bg-white/[.07] p-3">
           <div className="grid h-9 w-9 place-items-center rounded-lg bg-[#5eb7ff] text-xs font-extrabold text-[#062b5c]">{user.name[0]}</div>
           <div className="min-w-0"><p className="truncate text-xs font-bold text-white">{user.name}</p><p className="mt-0.5 text-[10px] font-semibold text-[#9ac9f6]">{user.role === "superadmin" ? "Platform administration" : user.role === "admin" ? "Hiring workspace" : "Candidate portal"}</p></div>
         </div>
-        <nav className="app-nav grid gap-[5px] max-lg:flex max-lg:gap-[7px] max-lg:overflow-x-auto">
+        <nav className="app-nav grid gap-[5px]">
           {links.map(([to, label]) => (
             <NavLink
               key={to}
@@ -52,7 +52,7 @@ export default function AppLayout() {
           ))}
         </nav>
         <button
-          className="mt-auto w-full rounded-xl border border-white/15 bg-white/[.06] px-[18px] py-[11px] text-left text-[13px] font-bold text-[#d9eaff] transition hover:bg-[#d94a57] hover:text-white max-lg:float-right max-lg:my-3 max-lg:w-auto max-lg:px-3 max-lg:py-2"
+          className="mt-auto w-full rounded-xl border border-white/15 bg-white/[.06] px-[18px] py-[11px] text-left text-[13px] font-bold text-[#d9eaff] transition hover:bg-[#d94a57] hover:text-white"
           onClick={() => {
             logout();
             nav("/login", { replace: true });
@@ -61,7 +61,9 @@ export default function AppLayout() {
           Sign out
         </button>
       </aside>
-      <main className="app-main min-w-0 px-[17px] pb-[25px] md:px-[38px] md:pb-[38px] lg:h-screen lg:min-h-0 lg:overflow-x-hidden lg:overflow-y-auto">
+      {!menuOpen && <button type="button" className="sidebar-menu-trigger" aria-label="Open navigation menu" onClick={() => setMenuOpen(true)}>☰</button>}
+      {menuOpen && <div className="menu-backdrop" />}
+      <main className="app-main min-w-0 px-[17px] pb-[25px] md:px-[38px] md:pb-[38px] lg:min-h-screen lg:overflow-x-hidden lg:overflow-y-auto">
         <header className="app-header mb-5 flex items-center justify-between border-b border-[#e7edf5] bg-[#f4f8fc] py-[19px] md:mb-7 md:py-7 md:pb-[26px]">
           <div>
             <h1 className="m-0 text-[25px] font-bold tracking-[-.7px]">Welcome, {user.name.split(" ")[0]}</h1>

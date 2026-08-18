@@ -6,7 +6,7 @@ const jobSchema = new mongoose.Schema(
     clientName: { type: String, trim: true },
     projectName: { type: String, trim: true },
     department: { type: String, required: true },
-    description: { type: String, required: true },
+    description: { type: String, default: "" },
     experience: { min: { type: Number, default: 0 }, max: Number },
     skills: [String],
     employmentType: {

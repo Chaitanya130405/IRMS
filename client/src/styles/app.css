@@ -35,27 +35,150 @@
 
 @media (min-width: 1024px) {
   html, body, #root { height: 100%; overflow: hidden; }
+
+  /* The document is intentionally locked on desktop; the workspace itself
+     must therefore be height-constrained so its overflow can scroll. */
+  .app-shell { height: 100%; }
+  .app-main { height: 100%; overflow-y: auto; }
 }
 
 /* Authenticated workspace: a small, consistent visual system for every page. */
 .app-shell {
-  background: #f6f8fc;
+  background: #f3f7fc;
+  transition: padding-left 300ms ease;
 }
 
 .app-sidebar {
-  background: linear-gradient(180deg, #082f63 0%, #041b3e 100%);
+  background: linear-gradient(180deg, #0a376f 0%, #041d43 52%, #031634 100%);
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 50;
+  width: 280px;
+  overflow-y: auto;
+  transform: translateX(-100%);
+  transition: transform 300ms ease;
+}
+
+.app-sidebar.menu-open {
+  transform: translateX(0);
+}
+
+.app-sidebar .sidebar-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, .22);
+  border-radius: 9px;
+  background: rgba(255, 255, 255, .1);
+  color: #fff;
+  font-size: 22px;
+  line-height: 1;
+}
+
+.app-sidebar .sidebar-close:hover {
+  background: rgba(255, 255, 255, .18);
+}
+
+.app-shell .sidebar-menu-trigger {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 30;
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  padding: 0;
+  border: 1px solid #d5e3f1;
+  border-radius: 11px;
+  background: #fff;
+  color: #0759aa;
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1;
+  box-shadow: 0 6px 16px rgba(20, 54, 93, .12);
+}
+
+.app-shell .sidebar-menu-trigger:hover {
+  background: #edf7ff;
+}
+
+.menu-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: rgba(3, 22, 52, .45);
+  backdrop-filter: blur(1px);
+}
+
+.app-brand {
+  margin: 0 10px 18px;
+  color: #fff;
+  font-size: 27px;
+  font-weight: 800;
+  letter-spacing: -.055em;
+  line-height: 1;
+}
+
+.app-brand span span {
+  color: #75bfff;
 }
 
 .app-main {
+  max-width: 100%;
   scrollbar-gutter: stable;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(120, 194, 255, .13), transparent 30%),
+    radial-gradient(circle at 0% 100%, rgba(225, 238, 252, .75), transparent 34%),
+    #f6f9fd;
+}
+
+@media (min-width: 1024px) {
+  .app-shell.menu-open {
+    box-sizing: border-box;
+    padding-left: 280px;
+  }
+
+  .menu-backdrop {
+    display: none;
+  }
 }
 
 .app-header {
   min-height: 104px;
+  padding-left: 58px;
+  border-color: #dfe9f3;
+  background: rgba(246, 249, 253, .84);
+  backdrop-filter: blur(12px);
+}
+
+.app-header h1 {
+  color: #082d5a;
+  font-size: clamp(23px, 2.1vw, 29px);
+  font-weight: 800;
+}
+
+.app-header p {
+  color: #667f9f;
 }
 
 .app-nav a {
   letter-spacing: -.01em;
+}
+
+.app-sidebar .role {
+  margin-top: 0;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(178, 215, 248, .16);
+}
+
+.app-sidebar .app-nav a {
+  min-height: 44px;
 }
 
 .app-main :is(input, select, textarea) {
@@ -79,11 +202,57 @@
 .app-main .detail-card,
 .app-main .timeline-card {
   border-color: #e0e8f2;
-  box-shadow: 0 8px 24px rgba(20, 54, 93, .055);
+  box-shadow: 0 14px 32px rgba(20, 54, 93, .065);
+}
+
+.app-main .panel {
+  border-radius: 20px;
+}
+
+.app-main .page-actions {
+  padding-bottom: 3px;
+}
+
+.app-main .page-actions h2 {
+  font-size: 24px;
+}
+
+.app-main label {
+  color: #1f416a;
+  letter-spacing: -.01em;
+}
+
+.app-main :is(input, select, textarea) {
+  background: #fcfdff;
+  transition: border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+}
+
+.app-main :is(input, select, textarea):hover {
+  border-color: #bfd4e9;
+  background: #fff;
+}
+
+.app-main button:not(.sidebar-close):not(.sidebar-menu-trigger) {
+  box-shadow: 0 7px 15px rgba(8, 117, 225, .16);
+}
+
+.app-main button:not(.sidebar-close):not(.sidebar-menu-trigger):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 11px 20px rgba(8, 117, 225, .22);
+}
+
+.app-main .pagination button,
+.app-main .pagination button:hover {
+  transform: none;
+  box-shadow: none;
 }
 
 .app-main .page-actions {
   min-height: 50px;
+}
+
+.app-main .application-page-controls {
+  justify-content: flex-end;
 }
 
 .app-main .page-actions h2,
@@ -112,7 +281,7 @@
 }
 
 .app-main tbody tr:hover {
-  background: #f8fbff;
+  background: #f4f9ff;
 }
 
 .app-main .job-grid {
