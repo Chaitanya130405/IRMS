@@ -6,7 +6,6 @@ import mongoSanitize from "express-mongo-sanitize";
 import xss from "xss-clean";
 import morgan from "morgan";
 import path from "path";
-
 import authRoutes from "./routes/authRoutes.js";
 import jobRoutes from "./routes/jobRoutes.js";
 import applicationRoutes from "./routes/applicationRoutes.js";

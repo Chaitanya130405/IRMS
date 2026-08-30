@@ -1,7 +1,6 @@
 # iSpace Recruitment Management System (IRMS)
 
 Recruitment Referral Management System built with React, Express, MongoDB, Mongoose, JWT, and plain CSS.
-;
 ## Setup
 
 1. Copy `server/.env.example` to `server/.env` and configure MongoDB/JWT.
