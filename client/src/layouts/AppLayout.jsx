@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import logo from "../../images/logo.png";
 const candidate = [
   ["/dashboard", "Dashboard"],
   ["/jobs", "Open Jobs"],
@@ -44,10 +45,7 @@ export default function AppLayout() {
           ✕
         </button>
         <div className="app-brand">
-          <span className="app-brand-mark">i</span>
-          <span>
-            i<span>Space</span>
-          </span>
+          <img src={logo} alt="iSpace" />
         </div>
         <p className="mx-3 mb-7 mt-[5px] text-[10px] font-extrabold tracking-[1.6px] text-[#75bfff]">
           {user.role === "superadmin"

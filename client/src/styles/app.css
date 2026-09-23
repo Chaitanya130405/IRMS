@@ -1539,28 +1539,12 @@ body {
   letter-spacing: -0.06em;
 }
 
-.app-brand-mark {
-  display: grid;
-  width: 34px;
-  height: 34px;
-  place-items: center;
-  border-radius: 11px;
-  background: var(--coral);
-  color: #fff;
-  font-size: 21px;
-  font-weight: 800;
-  letter-spacing: -0.08em;
-  box-shadow: 0 8px 18px rgba(237, 118, 95, 0.25);
-}
-
-.app-brand > span:last-child {
-  color: #fff;
-  font-size: 27px;
-  font-weight: 800;
-}
-
-.app-brand > span:last-child span {
-  color: #78c7ff;
+.app-brand img {
+  display: block;
+  width: 158px;
+  height: auto;
+  max-height: 48px;
+  object-fit: contain;
 }
 
 .app-sidebar .role {
