@@ -8,4 +8,5 @@ const schema = new mongoose.Schema(
   },
   { timestamps: true },
 );
+schema.index({ user: 1, createdAt: -1 });
 export default mongoose.model("Notification", schema);

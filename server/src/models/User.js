@@ -33,4 +33,5 @@ userSchema.pre("save", async function (next) {
 userSchema.methods.comparePassword = function (value) {
   return bcrypt.compare(value, this.password);
 };
+userSchema.index({ role: 1, createdAt: -1 });
 export default mongoose.model("User", userSchema);

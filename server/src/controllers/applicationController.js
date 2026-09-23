@@ -11,6 +11,7 @@ const populated = (query, includeInternalJobDetails = false) =>
     .populate("candidate", "name email phone profilePicture")
     .populate("job", includeInternalJobDetails ? undefined : "-clientName -projectName")
     .populate("referral");
+const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 export const createApplication = asyncHandler(async (req, res) => {
   if (!req.file) throw new AppError("Resume is required");
   const { job, referral, coverLetter, additionalNotes } = req.body;
@@ -69,6 +70,8 @@ export const listApplications = asyncHandler(async (req, res) => {
     page = 1,
     limit = 10,
   } = req.query;
+  const pageNumber = Math.max(Number(page) || 1, 1);
+  const pageSize = Math.min(Math.max(Number(limit) || 10, 1), 10000);
   const q = req.user.role === "candidate" ? { candidate: req.user.id } : {};
   if (status) q.status = status;
   if (period === "today") {
@@ -77,32 +80,40 @@ export const listApplications = asyncHandler(async (req, res) => {
     q.createdAt = { $gte: today };
   }
   if (group === "pending") q.status = { $in: ["Applied", "Resume Under Review", "Technical Round", "HR Round"] };
-  if (search) q.$or = [{ applicationId: new RegExp(search, "i") }];
-  const query = populated(
-    Application.find(q).sort("-createdAt"),
-    req.user.role === "admin",
-  );
-  const all = await query;
-  let rows = all.filter(
-    (a) =>
-      (!department || a.job?.department === department) &&
-      (!location || a.job?.location === location) &&
-      (!search ||
-        q.$or ||
-        [
-          a.candidate?.name,
-          a.candidate?.email,
-          a.job?.title,
-          a.referral?.employeeId,
-        ].some((v) => v?.match(new RegExp(search, "i")))),
-  );
-  const total = rows.length;
-  rows = rows.slice((page - 1) * limit, page * limit);
+  const jobQuery = {};
+  if (department) jobQuery.department = department;
+  if (location) jobQuery.location = location;
+  const regex = search ? new RegExp(escapeRegex(search), "i") : null;
+  const [matchingUsers, matchingJobs, matchingReferrals] = await Promise.all([
+    regex ? User.find({ $or: [{ name: regex }, { email: regex }] }).select("_id").lean() : [],
+    regex || Object.keys(jobQuery).length ? Job.find({ ...jobQuery, ...(regex ? { title: regex } : {}) }).select("_id").lean() : [],
+    regex ? Referral.find({ employeeId: regex }).select("_id").lean() : [],
+  ]);
+  if (department || location) q.job = { $in: matchingJobs.map((job) => job._id) };
+  if (regex) {
+    q.$or = [
+      { applicationId: regex },
+      { candidate: { $in: matchingUsers.map((user) => user._id) } },
+      { job: { $in: matchingJobs.map((job) => job._id) } },
+      { referral: { $in: matchingReferrals.map((referral) => referral._id) } },
+    ];
+  }
+  const [total, rows] = await Promise.all([
+    Application.countDocuments(q),
+    populated(
+      Application.find(q)
+        .sort("-createdAt")
+        .skip((pageNumber - 1) * pageSize)
+        .limit(pageSize)
+        .lean(),
+      req.user.role === "admin",
+    ),
+  ]);
   res.json({
     applications: rows,
     total,
-    page: Number(page),
-    pages: Math.ceil(total / limit),
+    page: pageNumber,
+    pages: Math.ceil(total / pageSize),
   });
 });
 export const getApplication = asyncHandler(async (req, res) => {

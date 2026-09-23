@@ -58,4 +58,7 @@ schema.pre("validate", function (next) {
   next();
 });
 schema.index({ candidate: 1, job: 1 }, { unique: true });
+schema.index({ candidate: 1, status: 1, createdAt: -1 });
+schema.index({ status: 1, createdAt: -1 });
+schema.index({ createdAt: -1 });
 export default mongoose.model("Application", schema);
