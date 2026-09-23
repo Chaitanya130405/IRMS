@@ -33,6 +33,12 @@ function JobSkeleton() {
 function NotificationSkeleton() {
   return <div className="notification-skeleton" role="status" aria-label="Loading notifications"><span className="loading-spinner" aria-hidden="true" /> Loading notifications…{Array.from({ length: 3 }, (_, index) => <article className="notification" key={index}><i /><i /><i /></article>)}</div>;
 }
+function DashboardSkeleton() {
+  return <div className="dashboard dashboard-skeleton" role="status" aria-label="Loading dashboard"><div className="dashboard-intro"><span className="loading-spinner" aria-hidden="true" /><p>Loading dashboard...</p><i /><i /></div><div className="cards">{Array.from({ length: 4 }, (_, index) => <article className="card" key={index}><i /><i /><i /></article>)}</div><section className="panel"><i /><i /><i /><i /></section></div>;
+}
+function ApplicationDetailSkeleton() {
+  return <div className="application-detail detail-skeleton" role="status" aria-label="Loading application"><span className="loading-spinner" aria-hidden="true" /> Loading application...<div /><div /><section /><section /></div>;
+}
 export function Dashboard({ admin = false }) {
   const [d, setD] = useState(null), [loadError, setLoadError] = useState("");
   const loadDashboard = () => {
@@ -43,7 +49,7 @@ export function Dashboard({ admin = false }) {
     loadDashboard();
   }, []);
   if (loadError) return <div className="center"><p>{loadError}</p><button type="button" onClick={loadDashboard}>Try again</button></div>;
-  if (!d) return <div className="center">Loading dashboard…</div>;
+  if (!d) return <DashboardSkeleton />;
   const applicationPath = admin ? "/admin/applications" : "/applications";
   const cards = admin
     ? [
@@ -150,7 +156,7 @@ export function ApplicationDetails() {
     }).catch(() => setError('Could not load this application.'));
   }, [id]);
   if (error && !app) return <div className="center">{error}</div>;
-  if (!app) return <div className="center">Loading application...</div>;
+  if (!app) return <ApplicationDetailSkeleton />;
   const candidateName = app.candidate?.name || 'Candidate unavailable';
   const initials = candidateName.split(' ').map((part) => part[0]).join('').slice(0, 2).toUpperCase();
   const resumeUrl = app.resume?.path && `${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000'}/uploads/${app.resume.path}`;
@@ -344,6 +350,8 @@ export function Jobs({ admin = false, onlyActive = false }) {
 export function Apply() {
   const nav = useNavigate(),
     [jobs, setJobs] = useState([]),
+    [jobsLoading, setJobsLoading] = useState(true),
+    [jobsError, setJobsError] = useState(""),
     [file, setFile] = useState(),
     [msg, setMsg] = useState(""),
     [submitting, setSubmitting] = useState(false),
@@ -359,7 +367,10 @@ export function Apply() {
       additionalNotes: "",
     });
   useEffect(() => {
-    api.get("/jobs?status=active").then((r) => setJobs(r.data.jobs));
+    api.get("/jobs?status=active")
+      .then((r) => setJobs(r.data.jobs))
+      .catch((error) => setJobsError(error.response?.data?.message || "Could not load open positions."))
+      .finally(() => setJobsLoading(false));
   }, []);
   const set = (k, v) => setF({ ...f, [k]: v });
   const submit = async (e) => {
@@ -400,15 +411,17 @@ export function Apply() {
           <select
             required
             value={f.job}
+            disabled={jobsLoading || Boolean(jobsError)}
             onChange={(e) => set("job", e.target.value)}
           >
-            <option value="">Select role</option>
+            <option value="">{jobsLoading ? "Loading open positions..." : jobsError ? "Positions unavailable" : "Select role"}</option>
             {jobs.map((j) => (
               <option value={j._id} key={j._id}>
                 {j.jobId} — {j.title}
               </option>
             ))}
           </select>
+          {jobsError && <small className="error">{jobsError}</small>}
         </label>
         {[
           ["employeeName", "Employee name"],

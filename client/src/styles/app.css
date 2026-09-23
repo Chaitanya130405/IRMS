@@ -397,6 +397,51 @@
 .notification-skeleton .notification i:nth-child(2) { width: 78%; }
 .notification-skeleton .notification i:nth-child(3) { width: 20%; }
 
+.page-skeleton,
+.detail-skeleton {
+  color: #667b96;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.page-skeleton {
+  display: grid;
+  gap: 18px;
+  margin: 44px auto;
+  max-width: 980px;
+}
+
+.page-skeleton > div,
+.detail-skeleton > div,
+.detail-skeleton section,
+.dashboard-skeleton i,
+.dashboard-skeleton .panel > i {
+  animation: skeleton-pulse 1.2s ease-in-out infinite;
+  background: linear-gradient(90deg, #edf3f8 25%, #f8fbfd 50%, #edf3f8 75%);
+  background-size: 200% 100%;
+  border-radius: 12px;
+  display: block;
+}
+
+.page-skeleton > div { height: 64px; }
+.page-skeleton > div:nth-child(3) { height: 230px; }
+
+.dashboard-skeleton .dashboard-intro { min-height: 156px; }
+.dashboard-skeleton .dashboard-intro p { display: inline; margin-left: 5px; }
+.dashboard-skeleton .dashboard-intro > i { height: 20px; margin-top: 20px; max-width: 380px; }
+.dashboard-skeleton .dashboard-intro > i:last-child { height: 12px; margin-top: 12px; max-width: 270px; }
+.dashboard-skeleton .card { min-height: 144px; }
+.dashboard-skeleton .card i { height: 14px; margin-bottom: 15px; width: 42%; }
+.dashboard-skeleton .card i:nth-child(2) { height: 34px; width: 60%; }
+.dashboard-skeleton .card i:nth-child(3) { width: 75%; }
+.dashboard-skeleton .panel { display: grid; gap: 15px; min-height: 250px; }
+.dashboard-skeleton .panel > i { height: 16px; width: 100%; }
+
+.detail-skeleton { display: grid; gap: 18px; margin: 20px auto; max-width: 1180px; }
+.detail-skeleton > div { height: 80px; }
+.detail-skeleton > div:nth-child(3) { height: 130px; }
+.detail-skeleton section { height: 210px; }
+
 @keyframes loading-spin { to { transform: rotate(360deg); } }
 @keyframes skeleton-pulse { to { background-position: -200% 0; } }
 
