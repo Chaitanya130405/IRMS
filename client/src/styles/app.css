@@ -1310,6 +1310,82 @@
   }
 }
 
+/* Final route-level overrides: the applications page stays open, not card-shaped. */
+@media (min-width: 1024px) {
+  .app-content > .applications-panel {
+    display: flex;
+    min-height: 0;
+    height: 100%;
+    padding: 0 0 24px;
+    overflow: hidden;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .applications-panel > .page-actions {
+    display: flex;
+    flex: 0 0 auto;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 24px;
+    margin: 0 0 18px;
+    padding: 0 0 16px;
+    border-bottom: 1px solid #dce7f1;
+  }
+
+  .applications-panel > .page-actions > div:first-child {
+    min-width: 190px;
+    flex: 1 1 auto;
+  }
+
+  .applications-panel .application-page-controls {
+    display: flex;
+    flex: 0 1 auto;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .applications-panel .application-page-controls input {
+    width: 220px;
+  }
+
+  .applications-panel .application-page-controls select {
+    width: 170px;
+  }
+
+  .applications-panel .panel-content-scroll {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: auto;
+    border: 1px solid #dce7f1;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.65);
+  }
+}
+
+@media (max-width: 1023px) {
+  .applications-panel > .page-actions {
+    align-items: stretch;
+  }
+
+  .applications-panel .application-page-controls {
+    display: flex;
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .applications-panel .application-page-controls input,
+  .applications-panel .application-page-controls select {
+    min-width: 150px;
+    flex: 1 1 180px;
+  }
+}
+
 /* Open workspace treatment: sections provide rhythm, while only useful items get frames. */
 .app-main .panel,
 .app-main .applications-panel,
@@ -1832,5 +1908,80 @@ body {
 
   .app-main .page-actions {
     padding-bottom: 14px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .app-content > .applications-panel {
+    display: flex;
+    min-height: 0;
+    height: 100%;
+    padding: 0 0 24px;
+    overflow: hidden;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .applications-panel > .page-actions {
+    display: flex;
+    flex: 0 0 auto;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 24px;
+    margin: 0 0 18px;
+    padding: 0 0 16px;
+    border-bottom: 1px solid #dce7f1;
+  }
+
+  .applications-panel > .page-actions > div:first-child {
+    min-width: 190px;
+    flex: 1 1 auto;
+  }
+
+  .applications-panel .application-page-controls {
+    display: flex;
+    flex: 0 1 auto;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .applications-panel .application-page-controls input {
+    width: 220px;
+  }
+
+  .applications-panel .application-page-controls select {
+    width: 170px;
+  }
+
+  .applications-panel .panel-content-scroll {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: auto;
+    border: 1px solid #dce7f1;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.65);
+  }
+}
+
+@media (max-width: 1023px) {
+  .applications-panel > .page-actions {
+    align-items: stretch;
+  }
+
+  .applications-panel .application-page-controls {
+    display: flex;
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .applications-panel .application-page-controls input,
+  .applications-panel .application-page-controls select {
+    min-width: 150px;
+    flex: 1 1 180px;
   }
 }
