@@ -804,6 +804,46 @@ export function ApplicationDetails() {
                 </a>
               </div>
             </div>
+            <div className="contact-grid referral-facts">
+              <div>
+                <small>Candidate contact</small>
+                <span>{app.referral?.candidateContact || "Not provided"}</span>
+              </div>
+              <div>
+                <small>Relationship</small>
+                <span>
+                  {app.referral?.candidateRelationship ||
+                    app.referral?.relationship ||
+                    "Not provided"}
+                </span>
+              </div>
+              <div>
+                <small>Known for</small>
+                <span>{app.referral?.durationKnown || "Not provided"}</span>
+              </div>
+              <div>
+                <small>Worked directly</small>
+                <span>{app.referral?.workedDirectly || "Not provided"}</span>
+              </div>
+              <div>
+                <small>Experience</small>
+                <span>
+                  {app.referral?.candidateExperienceLevel || "Not provided"}
+                </span>
+              </div>
+              <div>
+                <small>Designation</small>
+                <span>{app.referral?.designation || "Not provided"}</span>
+              </div>
+              <div>
+                <small>Referral date</small>
+                <span>
+                  {app.referral?.createdAt
+                    ? new Date(app.referral.createdAt).toLocaleString()
+                    : "Captured on submission"}
+                </span>
+              </div>
+            </div>
           </article>
           {(app.coverLetter || app.additionalNotes) && (
             <article className="detail-card">
@@ -918,6 +958,30 @@ export function AccessDenied() {
     </div>
   );
 }
+export function ReferralPolicy() {
+  return (
+    <section className="panel page-scroll-panel policy-panel">
+      <p className="section-label">EMPLOYEE REFERRAL POLICY</p>
+      <h2>Referral policy</h2>
+      <p>
+        Referrals should be submitted with the candidate's consent and accurate
+        contact details.
+      </p>
+      <ul>
+        <li>Do not submit the same candidate more than once.</li>
+        <li>
+          Keep candidate information confidential and use it only for
+          recruitment.
+        </li>
+        <li>Declare your relationship with the candidate honestly.</li>
+        <li>Recruitment status updates are managed by the hiring team.</li>
+      </ul>
+      <Link className="button" to="/jobs">
+        Back to open jobs
+      </Link>
+    </section>
+  );
+}
 export function Jobs({ admin = false, onlyActive = false }) {
   const location = useLocation();
   const requestedStatus = new URLSearchParams(location.search).get("status");
@@ -978,6 +1042,62 @@ export function Jobs({ admin = false, onlyActive = false }) {
               />
             </label>
           ))}
+          <label className="md:col-span-2">
+            Job description
+            <textarea
+              required
+              value={form.description || ""}
+              onChange={(e) =>
+                setForm({ ...form, description: e.target.value })
+              }
+              placeholder="Describe the role, responsibilities, and required skills"
+            />
+          </label>
+          <label>
+            Experience level
+            <input
+              required
+              value={form.experienceLevel || ""}
+              onChange={(e) =>
+                setForm({ ...form, experienceLevel: e.target.value })
+              }
+              placeholder="e.g. 3-5 years"
+            />
+          </label>
+          <label>
+            Number of openings
+            <input
+              required
+              type="number"
+              min="1"
+              value={form.openings || 1}
+              onChange={(e) =>
+                setForm({ ...form, openings: Number(e.target.value) })
+              }
+            />
+          </label>
+          <label>
+            Priority
+            <select
+              value={form.priority || "Medium"}
+              onChange={(e) => setForm({ ...form, priority: e.target.value })}
+            >
+              <option>High</option>
+              <option>Medium</option>
+              <option>Low</option>
+            </select>
+          </label>
+          <label>
+            Work mode
+            <select
+              value={form.workMode || "Onsite"}
+              onChange={(e) => setForm({ ...form, workMode: e.target.value })}
+            >
+              <option>Onsite</option>
+              <option>WFO</option>
+              <option>WFH</option>
+            </select>
+          </label>
           <label>
             Employment type
             <select
@@ -1067,6 +1187,13 @@ export function Jobs({ admin = false, onlyActive = false }) {
                     <div className="mb-4 grid gap-1 text-[12px] font-semibold text-[#39709f]">
                       <span>Client: {j.clientName || "Not specified"}</span>
                       <span>Project: {j.projectName || "Not specified"}</span>
+                      <span>
+                        Openings: {j.openings || 1} · {j.workMode || "Onsite"}
+                      </span>
+                      <span>
+                        Priority: {j.priority || "Medium"} · Experience:{" "}
+                        {j.experienceLevel || "Not specified"}
+                      </span>
                     </div>
                   )}
                   <p>
@@ -1125,6 +1252,12 @@ export function Apply() {
       employeeEmail: "",
       department: "",
       relationship: "",
+      candidateContact: "",
+      candidateRelationship: "",
+      durationKnown: "",
+      workedDirectly: "",
+      candidateExperienceLevel: "",
+      designation: "",
       remarks: "",
       coverLetter: "",
       additionalNotes: "",
@@ -1141,11 +1274,59 @@ export function Apply() {
       .finally(() => setJobsLoading(false));
   }, []);
   const set = (k, v) => setF({ ...f, [k]: v });
+  const [duplicateMessage, setDuplicateMessage] = useState("");
+  const [checkingDuplicate, setCheckingDuplicate] = useState(false);
+  const checkDuplicate = async () => {
+    if (!f.candidateContact || !f.job) return false;
+    setCheckingDuplicate(true);
+    setDuplicateMessage("");
+    try {
+      const { data } = await api.get("/applications/check-duplicate", {
+        params: { candidateContact: f.candidateContact, job: f.job },
+      });
+      if (data.referralExists) {
+        setDuplicateMessage(
+          data.applicationStatus
+            ? `This candidate already has an application (${data.applicationStatus}).`
+            : "This candidate has already been referred.",
+        );
+        return true;
+      }
+      if (data.candidateExists) {
+        setDuplicateMessage(
+          "A candidate with this contact already exists in the system.",
+        );
+        return true;
+      }
+      return false;
+    } catch (error) {
+      setDuplicateMessage(
+        error.response?.data?.message ||
+          "Could not check for duplicate candidates.",
+      );
+      return true;
+    } finally {
+      setCheckingDuplicate(false);
+    }
+  };
   const submit = async (e) => {
     e.preventDefault();
     if (submitting) return;
     setSubmitting(true);
     setMsg("");
+    if (
+      !/^(?:[^\s@]+@[^\s@]+\.[^\s@]+|\+?[\d\s().-]{7,})$/.test(
+        f.candidateContact.trim(),
+      )
+    ) {
+      setMsg("Enter a valid candidate phone number or email address.");
+      setSubmitting(false);
+      return;
+    }
+    if (await checkDuplicate()) {
+      setSubmitting(false);
+      return;
+    }
     const d = new FormData();
     d.append("job", f.job);
     d.append("resume", file);
@@ -1155,7 +1336,10 @@ export function Apply() {
       "referral",
       JSON.stringify(
         Object.fromEntries(
-          Object.entries(f).filter(
+          Object.entries({
+            ...f,
+            relationship: f.candidateRelationship,
+          }).filter(
             ([k]) => !["job", "coverLetter", "additionalNotes"].includes(k),
           ),
         ),
@@ -1172,8 +1356,16 @@ export function Apply() {
   };
   return (
     <section className="panel page-scroll-panel">
-      <h2>Submit referral application</h2>
+      <div className="form-intro">
+        <p className="section-label">EMPLOYEE REFERRAL</p>
+        <h2>Submit referral application</h2>
+        <p>
+          Share a strong candidate with the hiring team. Referral date and
+          status are captured automatically.
+        </p>
+      </div>
       <form className="form-grid" onSubmit={submit}>
+        <div className="form-section-heading">Job details</div>
         <label>
           Open position
           <select
@@ -1202,8 +1394,6 @@ export function Apply() {
           ["employeeId", "Employee ID"],
           ["employeeEmail", "Employee email"],
           ["department", "Employee department"],
-          ["relationship", "Relationship with candidate"],
-          ["remarks", "Referral remarks"],
         ].map(([k, l]) => (
           <label key={k}>
             {l}
@@ -1214,6 +1404,88 @@ export function Apply() {
             />
           </label>
         ))}
+        <div className="form-section-heading">Candidate details</div>
+        <label>
+          Candidate phone number or email
+          <input
+            required
+            value={f.candidateContact}
+            onChange={(e) => set("candidateContact", e.target.value)}
+            onBlur={checkDuplicate}
+            placeholder="name@example.com or +91 98765 43210"
+          />
+          <small>Enter either a valid phone number or email address.</small>
+        </label>
+        <label>
+          Candidate relationship
+          <select
+            required
+            value={f.candidateRelationship}
+            onChange={(e) => set("candidateRelationship", e.target.value)}
+          >
+            <option value="">Select relationship</option>
+            <option>Ex-colleague</option>
+            <option>Friend</option>
+            <option>Family</option>
+            <option>Classmate</option>
+            <option>Other</option>
+          </select>
+        </label>
+        <label>
+          Duration known
+          <select
+            required
+            value={f.durationKnown}
+            onChange={(e) => set("durationKnown", e.target.value)}
+          >
+            <option value="">Select duration</option>
+            <option>Less than 1 year</option>
+            <option>1-3 years</option>
+            <option>3-5 years</option>
+            <option>More than 5 years</option>
+          </select>
+        </label>
+        <label>
+          Worked directly
+          <select
+            required
+            value={f.workedDirectly}
+            onChange={(e) => set("workedDirectly", e.target.value)}
+          >
+            <option value="">Select one</option>
+            <option>Yes</option>
+            <option>No</option>
+          </select>
+        </label>
+        <label>
+          Candidate experience level
+          <input
+            required
+            value={f.candidateExperienceLevel}
+            onChange={(e) => set("candidateExperienceLevel", e.target.value)}
+            placeholder="e.g. Senior software engineer"
+          />
+        </label>
+        <label>
+          Designation / job title
+          <input
+            required
+            value={f.designation}
+            onChange={(e) => set("designation", e.target.value)}
+          />
+        </label>
+        <label>
+          Referral date & time
+          <input value="Captured automatically on submission" readOnly />
+        </label>
+        <label>
+          Referral status
+          <input value="Applied - tracked by recruitment workflow" readOnly />
+        </label>
+        {duplicateMessage && (
+          <p className="error form-section-wide">{duplicateMessage}</p>
+        )}
+        <div className="form-section-heading">Supporting information</div>
         <label>
           Resume (PDF/DOC/DOCX, max 5MB)
           <input
@@ -1230,16 +1502,31 @@ export function Apply() {
             onChange={(e) => set("coverLetter", e.target.value)}
           />
         </label>
+        <label>
+          Referral remarks
+          <textarea
+            value={f.remarks}
+            onChange={(e) => set("remarks", e.target.value)}
+            placeholder="Add context for the hiring team"
+          />
+        </label>
         <label className="check">
           <input required type="checkbox" />
           <span>
             <strong>Declaration</strong>
-            <span>I confirm that the information provided is accurate.</span>
+            <span>
+              I confirm that the information provided is accurate and follows
+              the <a href="/referral-policy">employee referral policy</a>.
+            </span>
           </span>
         </label>
         <div>
-          <button disabled={submitting}>
-            {submitting ? "Submitting..." : "Submit application"}
+          <button disabled={submitting || checkingDuplicate}>
+            {submitting
+              ? "Submitting..."
+              : checkingDuplicate
+                ? "Checking..."
+                : "Submit application"}
           </button>
         </div>
         {msg && <p className="error">{msg}</p>}
@@ -1344,6 +1631,13 @@ export function Applications({ admin = false, insight }) {
           "Referral Email",
           "Referral Department",
           "Relationship",
+          "Candidate Contact",
+          "Candidate Relationship",
+          "Duration Known",
+          "Worked Directly",
+          "Candidate Experience",
+          "Designation",
+          "Referral Date",
           "Status",
           "HR Remarks",
           "Internal Notes",
@@ -1367,6 +1661,13 @@ export function Applications({ admin = false, insight }) {
           application.referral?.employeeEmail,
           application.referral?.department,
           application.referral?.relationship,
+          application.referral?.candidateContact,
+          application.referral?.candidateRelationship,
+          application.referral?.durationKnown,
+          application.referral?.workedDirectly,
+          application.referral?.candidateExperienceLevel,
+          application.referral?.designation,
+          date(application.referral?.createdAt),
           application.status,
           application.hrRemarks,
           application.internalNotes,

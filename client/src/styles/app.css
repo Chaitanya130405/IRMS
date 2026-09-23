@@ -1628,6 +1628,77 @@ body {
   background: #dcecf8;
 }
 
+.form-intro {
+  margin-bottom: 28px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e6eef5;
+}
+
+.form-intro h2 {
+  margin-bottom: 7px !important;
+}
+
+.form-intro p:last-child {
+  margin: 0;
+  color: var(--ink-soft);
+}
+
+.section-label {
+  margin: 0 0 7px;
+  color: var(--blue);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+}
+
+.form-section-heading {
+  grid-column: 1 / -1;
+  margin-top: 8px;
+  padding: 13px 15px;
+  border-left: 3px solid var(--coral);
+  border-radius: 8px;
+  background: #f5f9fc;
+  color: var(--navy);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.form-section-wide {
+  grid-column: 1 / -1;
+}
+
+.form-grid label > small {
+  color: #7890a8;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.check a {
+  color: var(--blue);
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.policy-panel {
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.policy-panel > p:not(.section-label) {
+  color: var(--ink-soft);
+  line-height: 1.7;
+}
+
+.policy-panel li {
+  margin: 11px 0;
+  color: #3d5874;
+  line-height: 1.6;
+}
+
 @media (max-width: 639px) {
   .header-context {
     display: none;

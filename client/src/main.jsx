@@ -1,22 +1,49 @@
-import React from 'react';
-import { createRoot } from 'react-dom/client';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
-import ProtectedRoute from './components/ProtectedRoute';
-import AppLayout from './layouts/AppLayout';
-import { Login, Register, Forgot, ResetPassword } from './pages/AuthPages';
-import LandingPage from './pages/LandingPage';
-import { Dashboard, Jobs, Apply, Applications, ApplicationDetails, Profile, Notifications, AccessDenied, UserManagement, CreateAdmin, Candidates } from './pages/AppPages';
-import './styles/app.css';
+import React from "react";
+import { createRoot } from "react-dom/client";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
+import AppLayout from "./layouts/AppLayout";
+import { Login, Register, Forgot, ResetPassword } from "./pages/AuthPages";
+import LandingPage from "./pages/LandingPage";
+import {
+  Dashboard,
+  Jobs,
+  Apply,
+  Applications,
+  ApplicationDetails,
+  Profile,
+  Notifications,
+  AccessDenied,
+  ReferralPolicy,
+  UserManagement,
+  CreateAdmin,
+  Candidates,
+} from "./pages/AppPages";
+import "./styles/app.css";
 
-const Candidate = () => <ProtectedRoute role="candidate"><AppLayout /></ProtectedRoute>;
-const Admin = () => <ProtectedRoute role="admin"><AppLayout /></ProtectedRoute>;
-const SuperAdmin = () => <ProtectedRoute role="superadmin"><AppLayout /></ProtectedRoute>;
+const Candidate = () => (
+  <ProtectedRoute role="candidate">
+    <AppLayout />
+  </ProtectedRoute>
+);
+const Admin = () => (
+  <ProtectedRoute role="admin">
+    <AppLayout />
+  </ProtectedRoute>
+);
+const SuperAdmin = () => (
+  <ProtectedRoute role="superadmin">
+    <AppLayout />
+  </ProtectedRoute>
+);
 
-createRoot(document.getElementById('root')).render(
+createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <AuthProvider>
-      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <BrowserRouter
+        future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+      >
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<Login />} />
@@ -27,6 +54,7 @@ createRoot(document.getElementById('root')).render(
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/jobs" element={<Jobs />} />
             <Route path="/apply/:id" element={<Apply />} />
+            <Route path="/referral-policy" element={<ReferralPolicy />} />
             <Route path="/applications" element={<Applications />} />
             <Route path="/applications/:id" element={<ApplicationDetails />} />
             <Route path="/notifications" element={<Notifications />} />
@@ -35,14 +63,35 @@ createRoot(document.getElementById('root')).render(
           <Route element={<Admin />}>
             <Route path="/admin" element={<Dashboard admin />} />
             <Route path="/admin/jobs" element={<Jobs admin />} />
-            <Route path="/admin/applications" element={<Applications admin />} />
-            <Route path="/admin/applications/:id" element={<ApplicationDetails />} />
+            <Route
+              path="/admin/applications"
+              element={<Applications admin />}
+            />
+            <Route
+              path="/admin/applications/:id"
+              element={<ApplicationDetails />}
+            />
             <Route path="/admin/insights/candidates" element={<Candidates />} />
-            <Route path="/admin/insights/applications" element={<Applications admin insight="applications" />} />
-            <Route path="/admin/insights/today" element={<Applications admin insight="today" />} />
-            <Route path="/admin/insights/pending" element={<Applications admin insight="pending" />} />
-            <Route path="/admin/insights/interviews" element={<Applications admin insight="interviews" />} />
-            <Route path="/admin/insights/active-jobs" element={<Jobs admin onlyActive />} />
+            <Route
+              path="/admin/insights/applications"
+              element={<Applications admin insight="applications" />}
+            />
+            <Route
+              path="/admin/insights/today"
+              element={<Applications admin insight="today" />}
+            />
+            <Route
+              path="/admin/insights/pending"
+              element={<Applications admin insight="pending" />}
+            />
+            <Route
+              path="/admin/insights/interviews"
+              element={<Applications admin insight="interviews" />}
+            />
+            <Route
+              path="/admin/insights/active-jobs"
+              element={<Jobs admin onlyActive />}
+            />
             <Route path="/admin/notifications" element={<Notifications />} />
             <Route path="/admin/profile" element={<Profile />} />
           </Route>

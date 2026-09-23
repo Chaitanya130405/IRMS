@@ -7,6 +7,18 @@ const jobSchema = new mongoose.Schema(
     projectName: { type: String, trim: true },
     department: { type: String, required: true },
     description: { type: String, default: "" },
+    experienceLevel: { type: String, trim: true },
+    openings: { type: Number, min: 1, default: 1 },
+    priority: {
+      type: String,
+      enum: ["High", "Medium", "Low"],
+      default: "Medium",
+    },
+    workMode: {
+      type: String,
+      enum: ["Onsite", "WFO", "WFH"],
+      default: "Onsite",
+    },
     experience: { min: { type: Number, default: 0 }, max: Number },
     skills: [String],
     employmentType: {

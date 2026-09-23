@@ -4,6 +4,7 @@ import { protect, authorize } from "../middleware/auth.js";
 import { resumeUpload } from "../middleware/upload.js";
 const r = Router();
 r.use(protect);
+r.get("/check-duplicate", authorize("candidate"), c.checkDuplicate);
 r.get("/", authorize("candidate", "admin"), c.listApplications);
 r.post(
   "/",

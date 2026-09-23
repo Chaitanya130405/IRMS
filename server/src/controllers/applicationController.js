@@ -16,12 +16,73 @@ const populated = (query, includeInternalJobDetails = false) =>
     )
     .populate("referral");
 const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const contactQuery = (contact) => {
+  const value = contact.trim().toLowerCase();
+  return { $or: [{ email: value }, { phone: contact.trim() }] };
+};
+export const checkDuplicate = asyncHandler(async (req, res) => {
+  const { candidateContact, job } = req.query;
+  if (!candidateContact || !job)
+    return res.json({ candidateExists: false, referralExists: false });
+  const candidate = await User.findOne({
+    role: "candidate",
+    ...contactQuery(candidateContact),
+  })
+    .select("_id")
+    .lean();
+  const referral = await Referral.findOne({
+    candidateContact: candidateContact.trim(),
+  })
+    .select("_id")
+    .lean();
+  const application = candidate
+    ? await Application.findOne({ candidate: candidate._id, job })
+        .select("_id status")
+        .lean()
+    : null;
+  const otherCandidateExists =
+    candidate && String(candidate._id) !== String(req.user.id);
+  res.json({
+    candidateExists: Boolean(otherCandidateExists),
+    referralExists: Boolean(referral || application),
+    applicationStatus: application?.status || null,
+  });
+});
 export const createApplication = asyncHandler(async (req, res) => {
   if (!req.file) throw new AppError("Resume is required");
   const { job, referral, coverLetter, additionalNotes } = req.body;
   const exists = await Application.findOne({ candidate: req.user.id, job });
   if (exists) throw new AppError("You have already applied for this job", 409);
-  const ref = await Referral.create(JSON.parse(referral));
+  let referralData;
+  try {
+    referralData = JSON.parse(referral);
+  } catch {
+    throw new AppError("Referral details are invalid");
+  }
+  if (
+    !referralData.candidateContact ||
+    !/^(?:[^\s@]+@[^\s@]+\.[^\s@]+|\+?[\d\s().-]{7,})$/.test(
+      referralData.candidateContact.trim(),
+    )
+  )
+    throw new AppError("Enter a valid candidate phone number or email address");
+  referralData.candidateContact = referralData.candidateContact.trim();
+  const candidate = await User.findOne({
+    role: "candidate",
+    ...contactQuery(referralData.candidateContact),
+  })
+    .select("_id")
+    .lean();
+  if (candidate && String(candidate._id) !== String(req.user.id))
+    throw new AppError("A candidate with this contact already exists", 409);
+  const duplicateReferral = await Referral.findOne({
+    candidateContact: referralData.candidateContact.trim(),
+  })
+    .select("_id")
+    .lean();
+  if (duplicateReferral)
+    throw new AppError("This candidate has already been referred", 409);
+  const ref = await Referral.create(referralData);
   const application = await Application.create({
     candidate: req.user.id,
     job,
