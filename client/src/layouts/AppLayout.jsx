@@ -78,7 +78,9 @@ export default function AppLayout() {
             {user.name[0]}
           </button>
         </header>
-        <Outlet />
+        <div className="app-content min-h-0 flex-1 overflow-y-auto">
+          <Outlet />
+        </div>
       </main>
     </div>
   );

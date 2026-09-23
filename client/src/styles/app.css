@@ -36,10 +36,15 @@
 @media (min-width: 1024px) {
   html, body, #root { height: 100%; overflow: hidden; }
 
-  /* The document is intentionally locked on desktop; the workspace itself
-     must therefore be height-constrained so its overflow can scroll. */
+  /* Keep the workspace fixed; only the route content receives a scrollbar. */
   .app-shell { height: 100%; }
-  .app-main { height: 100%; overflow-y: auto; }
+  .app-main {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+  }
+  .app-content { min-height: 0; overflow-y: auto; }
 }
 
 /* Authenticated workspace: a small, consistent visual system for every page. */
