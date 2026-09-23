@@ -20,6 +20,19 @@ function Pagination({ page, pages, total, onChange }) {
   const numbers = Array.from({ length: pages }, (_, index) => index + 1).filter((number) => number === 1 || number === pages || Math.abs(number - page) <= 1);
   return <div className="pagination"><span>Page {page} of {pages} · {total} results</span><div><button type="button" aria-label="Previous page" onClick={() => onChange(page - 1)} disabled={page === 1}>←</button>{numbers.map((number, index) => <React.Fragment key={number}>{index > 0 && numbers[index - 1] !== number - 1 && <i>…</i>}<button type="button" className={number === page ? 'active' : ''} onClick={() => onChange(number)}>{number}</button></React.Fragment>)}<button type="button" aria-label="Next page" onClick={() => onChange(page + 1)} disabled={page === pages}>→</button></div></div>;
 }
+function TableSkeleton({ columns = 6, rows = 5 }) {
+  return <div className="table-skeleton" role="status" aria-label="Loading data">
+    <span className="loading-spinner" aria-hidden="true" />
+    <span>Loading data…</span>
+    <table aria-hidden="true"><tbody>{Array.from({ length: rows }, (_, row) => <tr key={row}>{Array.from({ length: columns }, (_, column) => <td key={column}><i /></td>)}</tr>)}</tbody></table>
+  </div>;
+}
+function JobSkeleton() {
+  return <div className="job-grid" role="status" aria-label="Loading jobs">{Array.from({ length: 3 }, (_, index) => <article className="job job-skeleton" key={index}><i /><i /><i /><i /></article>)}</div>;
+}
+function NotificationSkeleton() {
+  return <div className="notification-skeleton" role="status" aria-label="Loading notifications"><span className="loading-spinner" aria-hidden="true" /> Loading notifications…{Array.from({ length: 3 }, (_, index) => <article className="notification" key={index}><i /><i /><i /></article>)}</div>;
+}
 export function Dashboard({ admin = false }) {
   const [d, setD] = useState(null), [loadError, setLoadError] = useState("");
   const loadDashboard = () => {
@@ -96,7 +109,7 @@ export function Dashboard({ admin = false }) {
 }
 
 export function Profile(){const {user,setUser}=useAuth(),[f,setF]=useState({name:user.name,phone:user.phone||''}),[message,setMessage]=useState('');return <section className="panel profile-panel"><div className="profile-heading"><div className="profile-monogram">{user.name[0]}</div><div><h2>Profile settings</h2><p>Manage your account information.</p></div></div><form onSubmit={async e=>{e.preventDefault();const r=await api.patch('/profile',f);setUser(r.data.user);setMessage('Profile updated')}}><label>Name<input value={f.name} onChange={e=>setF({...f,name:e.target.value})}/></label><label>Email<input value={user.email} disabled/></label><label>Phone<input value={f.phone} onChange={e=>setF({...f,phone:e.target.value})}/></label><div className="profile-actions"><button>Save changes</button>{message&&<p className="success">{message}</p>}</div></form></section>}
-export function Notifications(){const [rows,setRows]=useState([]),[page,setPage]=useState(1);useEffect(()=>{api.get('/notifications').then(r=>setRows(r.data.notifications))},[]);const pages=Math.ceil(rows.length/PAGE_SIZE),shown=rows.slice((page-1)*PAGE_SIZE,page*PAGE_SIZE);return <section className="panel"><h2>Notifications</h2>{shown.map(n=><article className={`notification ${n.read?'':'unread'}`} key={n._id}><strong>{n.title}</strong><p>{n.message}</p><small>{new Date(n.createdAt).toLocaleString()}</small></article>)}{!rows.length&&<p>No notifications yet.</p>}<Pagination page={page} pages={pages} total={rows.length} onChange={setPage}/></section>}
+export function Notifications(){const [rows,setRows]=useState([]),[page,setPage]=useState(1),[loading,setLoading]=useState(true),[error,setError]=useState('');useEffect(()=>{api.get('/notifications').then(r=>setRows(r.data.notifications)).catch(e=>setError(e.response?.data?.message||'Could not load notifications.')).finally(()=>setLoading(false))},[]);const pages=Math.ceil(rows.length/PAGE_SIZE),shown=rows.slice((page-1)*PAGE_SIZE,page*PAGE_SIZE);return <section className="panel"><h2>Notifications</h2>{loading?<NotificationSkeleton/>:<>{shown.map(n=><article className={`notification ${n.read?'':'unread'}`} key={n._id}><strong>{n.title}</strong><p>{n.message}</p><small>{new Date(n.createdAt).toLocaleString()}</small></article>)}{error?<p className="error table-state">{error}</p>:!rows.length&&<p>No notifications yet.</p>}<Pagination page={page} pages={pages} total={rows.length} onChange={setPage}/></>}</section>}
 export function Candidates() {
   const [rows, setRows] = useState([]);
   const [search, setSearch] = useState("");
@@ -116,10 +129,10 @@ export function Candidates() {
   return <section className="panel">
     <div className="page-actions"><div><h2>Candidates</h2><p>Review registered candidates and their contact details.</p></div><div><input value={search} placeholder="Search candidates" onChange={(event) => setSearch(event.target.value)} /><button type="button" onClick={() => { setPage(1); load(1); }}>Search</button></div></div>
     {error && <p className="error">{error}</p>}
-    {loading ? <p className="table-state">Loading candidates…</p> : <><table><thead><tr><th>Candidate</th><th>Phone</th><th>Account status</th><th>Joined</th><th>Last sign-in</th></tr></thead><tbody>{rows.map((candidate) => <tr key={candidate._id}><td>{candidate.name}<small>{candidate.email}</small></td><td>{candidate.phone || "Not provided"}</td><td><span className={`badge ${candidate.status === "active" ? "selected" : "rejected"}`}>{candidate.status}</span></td><td>{new Date(candidate.createdAt).toLocaleDateString()}</td><td>{candidate.lastLogin ? new Date(candidate.lastLogin).toLocaleDateString() : "Never"}</td></tr>)}</tbody></table>{!rows.length && <p className="table-state">No candidates found.</p>}<Pagination page={page} pages={meta.pages} total={meta.total} onChange={setPage}/></>}
+    {loading ? <TableSkeleton columns={5} /> : <><table><thead><tr><th>Candidate</th><th>Phone</th><th>Account status</th><th>Joined</th><th>Last sign-in</th></tr></thead><tbody>{rows.map((candidate) => <tr key={candidate._id}><td>{candidate.name}<small>{candidate.email}</small></td><td>{candidate.phone || "Not provided"}</td><td><span className={`badge ${candidate.status === "active" ? "selected" : "rejected"}`}>{candidate.status}</span></td><td>{new Date(candidate.createdAt).toLocaleDateString()}</td><td>{candidate.lastLogin ? new Date(candidate.lastLogin).toLocaleDateString() : "Never"}</td></tr>)}</tbody></table>{!rows.length && !error && <p className="table-state">No candidates found.</p>}<Pagination page={page} pages={meta.pages} total={meta.total} onChange={setPage}/></>}
   </section>;
 }
-export function UserManagement(){const [users,setUsers]=useState([]),[error,setError]=useState(''),[updating,setUpdating]=useState(''),[page,setPage]=useState(1);const load=()=>api.get('/users').then(r=>setUsers(r.data.users)).catch(e=>setError(e.response?.data?.message||'Could not load HR admins'));useEffect(()=>{load()},[]);const changeStatus=async(user)=>{setUpdating(user._id);setError('');try{const status=user.status==='active'?'inactive':'active';const r=await api.patch(`/users/${user._id}/status`,{status});setUsers(users.map(u=>u._id===user._id?{...u,...r.data.user,_id:u._id}:u))}catch(e){setError(e.response?.data?.message||'Could not update account')}finally{setUpdating('')}};const date=(value)=>value?new Date(value).toLocaleString():'Never',pages=Math.ceil(users.length/PAGE_SIZE),shown=users.slice((page-1)*PAGE_SIZE,page*PAGE_SIZE);return <section className="panel"><div className="page-actions"><div><h2>HR admin monitoring</h2><p>Review access and activity for every HR administrator.</p></div></div>{error&&<p className="error">{error}</p>}<table><thead><tr><th>Name</th><th>Email</th><th>Status</th><th>Last sign-in</th><th>Jobs</th><th>HR actions</th><th>Action</th></tr></thead><tbody>{shown.map(u=><tr key={u._id}><td>{u.name}<small>{new Date(u.createdAt).toLocaleDateString()}</small></td><td>{u.email}</td><td><span className={`badge ${u.status==='active'?'selected':'rejected'}`}>{u.status}</span></td><td>{date(u.lastLogin)}</td><td>{u.jobsCreated}</td><td>{u.actionsTaken}<small>{date(u.lastActivity)}</small></td><td><button disabled={updating===u._id} onClick={()=>changeStatus(u)}>{updating===u._id?'Updating...':u.status==='active'?'Deactivate':'Activate'}</button></td></tr>)}</tbody></table>{!users.length&&!error&&<p>No HR admin accounts found.</p>}<Pagination page={page} pages={pages} total={users.length} onChange={setPage}/></section>}
+export function UserManagement(){const [users,setUsers]=useState([]),[error,setError]=useState(''),[loading,setLoading]=useState(true),[updating,setUpdating]=useState(''),[page,setPage]=useState(1);const load=()=>{setLoading(true);setError('');return api.get('/users').then(r=>setUsers(r.data.users)).catch(e=>setError(e.response?.data?.message||'Could not load HR admins')).finally(()=>setLoading(false))};useEffect(()=>{load()},[]);const changeStatus=async(user)=>{setUpdating(user._id);setError('');try{const status=user.status==='active'?'inactive':'active';const r=await api.patch(`/users/${user._id}/status`,{status});setUsers(users.map(u=>u._id===user._id?{...u,...r.data.user,_id:u._id}:u))}catch(e){setError(e.response?.data?.message||'Could not update account')}finally{setUpdating('')}};const date=(value)=>value?new Date(value).toLocaleString():'Never',pages=Math.ceil(users.length/PAGE_SIZE),shown=users.slice((page-1)*PAGE_SIZE,page*PAGE_SIZE);return <section className="panel"><div className="page-actions"><div><h2>HR admin monitoring</h2><p>Review access and activity for every HR administrator.</p></div></div>{loading?<TableSkeleton columns={7}/>:<>{error&&<p className="error table-state">{error}</p>}<table><thead><tr><th>Name</th><th>Email</th><th>Status</th><th>Last sign-in</th><th>Jobs</th><th>HR actions</th><th>Action</th></tr></thead><tbody>{shown.map(u=><tr key={u._id}><td>{u.name}<small>{new Date(u.createdAt).toLocaleDateString()}</small></td><td>{u.email}</td><td><span className={`badge ${u.status==='active'?'selected':'rejected'}`}>{u.status}</span></td><td>{date(u.lastLogin)}</td><td>{u.jobsCreated}</td><td>{u.actionsTaken}<small>{date(u.lastActivity)}</small></td><td><button disabled={updating===u._id} onClick={()=>changeStatus(u)}>{updating===u._id?'Updating...':u.status==='active'?'Deactivate':'Activate'}</button></td></tr>)}</tbody></table>{!users.length&&!error&&<p>No HR admin accounts found.</p>}<Pagination page={page} pages={pages} total={users.length} onChange={setPage}/></>}</section>}
 export function CreateAdmin(){const [form,setForm]=useState({name:'',email:'',phone:'',password:''}),[message,setMessage]=useState(''),[error,setError]=useState('');const submit=async(e)=>{e.preventDefault();setError('');setMessage('');try{await api.post('/users/admins',form);setForm({name:'',email:'',phone:'',password:''});setMessage('HR admin created. Activate the account from HR Admins before sign-in.')}catch(e){setError(e.response?.data?.message||'Could not create HR admin')}};return <section className="panel"><div className="page-actions"><div><h2>Create HR admin</h2><p>New HR admin accounts require Super Admin approval before they can sign in.</p></div></div><form className="form-grid" onSubmit={submit}><label>Full name<input required value={form.name} onChange={e=>setForm({...form,name:e.target.value})}/></label><label>Email<input required type="email" value={form.email} onChange={e=>setForm({...form,email:e.target.value})}/></label><label>Phone<input value={form.phone} onChange={e=>setForm({...form,phone:e.target.value})}/></label><label>Password<input required minLength="8" type="password" value={form.password} onChange={e=>setForm({...form,password:e.target.value})}/></label><div><button>Create HR admin</button></div></form>{message&&<p className="success">{message}</p>}{error&&<p className="error">{error}</p>}</section>}
 export function ApplicationDetails() {
   const id = location.pathname.split('/').pop();
@@ -183,8 +196,20 @@ export function Jobs({ admin = false, onlyActive = false }) {
   const [jobs, setJobs] = useState([]),
     [form, setForm] = useState(null),
     [error, setError] = useState(""),
+    [loading, setLoading] = useState(true),
     [page, setPage] = useState(1);
-  const load = () => api.get("/jobs").then((r) => setJobs(r.data.jobs));
+  const load = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const response = await api.get("/jobs");
+      setJobs(response.data.jobs);
+    } catch (requestError) {
+      setError(requestError.response?.data?.message || "Could not load jobs.");
+    } finally {
+      setLoading(false);
+    }
+  };
   useEffect(() => {
     load();
   }, []);
@@ -272,7 +297,7 @@ export function Jobs({ admin = false, onlyActive = false }) {
         </div>
         {admin && <button onClick={() => setForm({})}>Create job</button>}
       </div>
-      <div className="job-grid">
+      {loading ? <JobSkeleton /> : <><div className="job-grid">
         {shownJobs.map((j) => (
             <article className="job" key={j._id}>
               <span>{j.department}</span>
@@ -310,8 +335,9 @@ export function Jobs({ admin = false, onlyActive = false }) {
             </article>
           ))}
       </div>
-      {!visibleJobs.length && <p>No positions found.</p>}
-      <Pagination page={page} pages={pages} total={visibleJobs.length} onChange={setPage}/>
+      {!visibleJobs.length && !error && <p>No positions found.</p>}
+      {error && <p className="error table-state">{error}</p>}
+      <Pagination page={page} pages={pages} total={visibleJobs.length} onChange={setPage}/></>}
     </>
   );
 }
@@ -451,12 +477,22 @@ export function Applications({ admin = false, insight }) {
     [page, setPage] = useState(1),
     [total, setTotal] = useState(0),
     [pages, setPages] = useState(0),
+    [loading, setLoading] = useState(true),
     [exporting, setExporting] = useState(false),
-    [exportError, setExportError] = useState("");
-  const load = (pageToLoad = page) =>
-    api
-      .get("/applications", { params: { status, search, period: activeInsight?.period || query.get("period") || "", group: activeInsight?.group || query.get("group") || "", page: pageToLoad, limit: PAGE_SIZE } })
-      .then((r) => { setRows(r.data.applications); setTotal(r.data.total); setPages(r.data.pages); });
+    [exportError, setExportError] = useState(""),
+    [loadError, setLoadError] = useState("");
+  const load = async (pageToLoad = page) => {
+    setLoading(true);
+    setLoadError("");
+    try {
+      const response = await api.get("/applications", { params: { status, search, period: activeInsight?.period || query.get("period") || "", group: activeInsight?.group || query.get("group") || "", page: pageToLoad, limit: PAGE_SIZE } });
+      setRows(response.data.applications); setTotal(response.data.total); setPages(response.data.pages);
+    } catch (requestError) {
+      setLoadError(requestError.response?.data?.message || "Could not load applications.");
+    } finally {
+      setLoading(false);
+    }
+  };
   useEffect(() => {
     setStatus(activeInsight?.status || query.get("status") || "");
     setPage(1);
@@ -513,7 +549,7 @@ export function Applications({ admin = false, insight }) {
         </div>
       </div>
       {exportError && <p className="error">{exportError}</p>}
-      <table>
+      {loading ? <TableSkeleton /> : <><table>
         <thead>
           <tr>
             <th>Candidate</th>
@@ -544,8 +580,9 @@ export function Applications({ admin = false, insight }) {
           ))}
         </tbody>
       </table>
-      {!rows.length && <p>No applications found.</p>}
-      <Pagination page={page} pages={pages} total={total} onChange={setPage}/>
+      {!rows.length && !loadError && <p>No applications found.</p>}
+      {loadError && <p className="error table-state">{loadError}</p>}
+      <Pagination page={page} pages={pages} total={total} onChange={setPage}/></>}
     </section>
   );
 }
