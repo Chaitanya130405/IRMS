@@ -123,10 +123,6 @@ export default function AppLayout() {
               iSpace Recruitment Management System
             </p>
           </div>
-          <div className="header-context">
-            <span className="header-context-dot" />
-            Live workspace
-          </div>
           <button
             className="grid h-[43px] w-[43px] place-items-center rounded-full border-0 bg-[#d7ecff] p-0 text-base font-extrabold text-[#0759aa] shadow-[0_5px_13px_#0875e133] hover:bg-[#bfe1ff]"
             title="Open profile"
