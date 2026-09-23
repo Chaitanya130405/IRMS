@@ -64,7 +64,6 @@
   .page-scroll-content,
   .panel-content-scroll {
     flex: 1;
-    height: 0;
     min-height: 0;
     overflow: auto !important;
     padding-right: 4px;
