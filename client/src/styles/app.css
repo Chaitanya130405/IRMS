@@ -1828,6 +1828,28 @@
   padding-left: 0 !important;
 }
 
+.app-header > div:first-child {
+  display: grid !important;
+  gap: 4px !important;
+}
+
+.app-header .workspace-kicker {
+  margin: 0 0 3px !important;
+  line-height: 1.2 !important;
+}
+
+.app-header h1 {
+  margin: 0 !important;
+  font-size: clamp(23px, 2vw, 29px) !important;
+  line-height: 1.08 !important;
+  letter-spacing: -0.045em !important;
+}
+
+.app-header > div:first-child > p:last-child {
+  margin: 0 !important;
+  line-height: 1.35 !important;
+}
+
 .app-main .application-sidebar .timeline-card h3,
 .app-main .application-sidebar .timeline-card strong {
   color: var(--navy);
