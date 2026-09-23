@@ -1423,12 +1423,13 @@
 }
 
 .app-main .application-sidebar .timeline-card {
-  overflow: visible;
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.82) !important;
+  overflow: visible !important;
+  border: 0 !important;
+  border-left: 1px solid #cbddea !important;
+  border-radius: 0 !important;
+  background: transparent !important;
   color: var(--ink);
-  box-shadow: 0 6px 18px rgba(25, 63, 101, 0.05);
+  box-shadow: none !important;
 }
 
 .app-main .application-main .detail-card,
@@ -1801,6 +1802,32 @@
     min-width: 150px;
     flex: 1 1 180px;
   }
+}
+
+/* Final application rail cleanup. */
+.app-main .application-sidebar .timeline-card {
+  margin: 0;
+  padding: 0 0 0 20px;
+  border: 0;
+  border-left: 1px solid #cbddea;
+  border-radius: 0;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.app-main .application-sidebar .timeline-card .detail-heading {
+  margin-bottom: 24px;
+  padding: 0;
+}
+
+.app-main .application-sidebar .timeline-card h3,
+.app-main .application-sidebar .timeline-card strong {
+  color: var(--navy);
+}
+
+.app-main .application-sidebar .timeline-card p,
+.app-main .application-sidebar .timeline-card small {
+  color: var(--ink-soft);
 }
 
 .app-main .application-detail {
