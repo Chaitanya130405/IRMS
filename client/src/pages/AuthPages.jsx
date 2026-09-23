@@ -7,14 +7,19 @@ export function Login() {
   const { login } = useAuth(),
     nav = useNavigate(),
     [form, setForm] = useState({ email: "", password: "" }),
-    [error, setError] = useState("");
+    [error, setError] = useState(""),
+    [submitting, setSubmitting] = useState(false);
   const submit = async (e) => {
     e.preventDefault();
+    if (submitting) return;
+    setSubmitting(true);
+    setError("");
     try {
       const u = await login(form);
       nav(u.role === "superadmin" ? "/superadmin" : u.role === "admin" ? "/admin" : "/dashboard", { replace: true });
     } catch (e) {
       setError(e.response?.data?.message || "Unable to sign in");
+      setSubmitting(false);
     }
   };
   return (
@@ -34,8 +39,8 @@ export function Login() {
         />
         {error && <p className="m-0 font-semibold text-[#d54253]">{error}</p>}
         <div className="flex flex-wrap items-center gap-4">
-          <button className="justify-self-start rounded-xl border-0 bg-[linear-gradient(135deg,#0875e1,#0754ae)] px-5 py-3 text-[13px] font-bold text-white shadow-[0_8px_16px_rgba(8,117,225,.2)] transition hover:-translate-y-px hover:shadow-[0_12px_20px_rgba(8,117,225,.28)]">
-            Sign in
+          <button disabled={submitting} className="justify-self-start rounded-xl border-0 bg-[linear-gradient(135deg,#0875e1,#0754ae)] px-5 py-3 text-[13px] font-bold text-white shadow-[0_8px_16px_rgba(8,117,225,.2)] transition hover:-translate-y-px hover:shadow-[0_12px_20px_rgba(8,117,225,.28)] disabled:cursor-not-allowed disabled:opacity-70">
+            {submitting ? "Signing in…" : "Sign in"}
           </button>
           <Link
             className="text-[13px] font-bold text-[#0875e1] no-underline hover:text-[#062b5c]"

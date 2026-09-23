@@ -32,8 +32,10 @@ export const login = asyncHandler(async (req, res) => {
     throw new AppError("Invalid email or password", 401);
   if (user.status !== "active")
     throw new AppError("Account unavailable", 401);
-  user.lastLogin = new Date();
-  await user.save();
+  // Login analytics must not hold up the authentication response.
+  void User.updateOne({ _id: user._id }, { $set: { lastLogin: new Date() } }).catch(
+    (error) => console.error("Could not update last login", error),
+  );
   respond(user, res);
 });
 export const me = asyncHandler(async (req, res) =>
