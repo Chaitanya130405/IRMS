@@ -47,8 +47,10 @@
   .app-content { min-height: 0; overflow: hidden; }
   .app-content > .panel,
   .app-content > .page-scroll-panel {
+    box-sizing: border-box;
+    height: 100%;
     max-height: 100%;
-    overflow: hidden;
+    overflow: hidden !important;
   }
   .app-content > .page-scroll {
     height: 100%;
@@ -62,8 +64,9 @@
   .page-scroll-content,
   .panel-content-scroll {
     flex: 1;
+    height: 0;
     min-height: 0;
-    overflow: auto;
+    overflow: auto !important;
     padding-right: 4px;
   }
 }
