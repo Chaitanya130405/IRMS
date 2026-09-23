@@ -303,6 +303,7 @@ export function Jobs({ admin = false, onlyActive = false }) {
         </div>
         {admin && <button onClick={() => setForm({})}>Create job</button>}
       </div>
+      <div className="page-scroll-content">
       {loading ? <JobSkeleton /> : <><div className="job-grid">
         {shownJobs.map((j) => (
             <article className="job" key={j._id}>
@@ -344,6 +345,7 @@ export function Jobs({ admin = false, onlyActive = false }) {
       {!visibleJobs.length && !error && <p>No positions found.</p>}
       {error && <p className="error table-state">{error}</p>}
       <Pagination page={page} pages={pages} total={visibleJobs.length} onChange={setPage}/></>}
+      </div>
     </section>
   );
 }
@@ -403,7 +405,7 @@ export function Apply() {
     }
   };
   return (
-    <section className="panel">
+    <section className="panel page-scroll-panel">
       <h2>Submit referral application</h2>
       <form className="form-grid" onSubmit={submit}>
         <label>
@@ -561,6 +563,7 @@ export function Applications({ admin = false, insight }) {
           {admin && <button type="button" onClick={exportDetails} disabled={exporting}>{exporting ? "Exporting..." : "Export details"}</button>}
         </div>
       </div>
+      <div className="panel-content-scroll">
       {exportError && <p className="error">{exportError}</p>}
       {loading ? <TableSkeleton /> : <><table>
         <thead>
@@ -596,6 +599,7 @@ export function Applications({ admin = false, insight }) {
       {!rows.length && !loadError && <p>No applications found.</p>}
       {loadError && <p className="error table-state">{loadError}</p>}
       <Pagination page={page} pages={pages} total={total} onChange={setPage}/></>}
+      </div>
     </section>
   );
 }

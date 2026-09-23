@@ -52,7 +52,18 @@
   }
   .app-content > .page-scroll {
     height: 100%;
-    overflow-y: auto;
+    overflow: hidden;
+  }
+  .page-scroll,
+  .page-scroll-panel {
+    display: flex;
+    flex-direction: column;
+  }
+  .page-scroll-content,
+  .panel-content-scroll {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
     padding-right: 4px;
   }
 }
