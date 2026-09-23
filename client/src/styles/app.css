@@ -1332,6 +1332,67 @@
   }
 }
 
+/* Cross-page alignment: every route starts on the same edge and uses the same surface rhythm. */
+.app-content > .panel:not(.applications-panel),
+.app-content > .page-scroll-panel {
+  width: 100%;
+  max-width: none;
+  padding: 0 0 28px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.app-content > .panel:not(.applications-panel) > h2:first-child {
+  margin: 0 0 22px;
+  padding: 0 0 17px;
+  border-bottom: 1px solid var(--line);
+  color: var(--navy);
+}
+
+.app-content > .panel:not(.applications-panel) > .page-actions,
+.app-content > .page-scroll-panel > .page-actions {
+  padding-top: 0;
+}
+
+.app-main .profile-panel {
+  max-width: none;
+  padding-right: 0;
+  padding-left: 0;
+}
+
+.app-main .profile-heading {
+  margin-bottom: 26px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+.app-main .application-detail {
+  max-width: none;
+}
+
+.app-main .application-topbar,
+.app-main .application-hero {
+  width: 100%;
+}
+
+.app-main .application-sidebar .timeline-card {
+  min-height: 0;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.72) !important;
+}
+
+.app-main .application-sidebar .timeline-card h3,
+.app-main .application-sidebar .timeline-card strong {
+  color: var(--navy);
+}
+
+.app-main .application-sidebar .timeline-card p,
+.app-main .application-sidebar .timeline-card small {
+  color: var(--ink-soft);
+}
+
 /* Final workspace system. Keep page structure open; frame only useful content. */
 *,
 *::before,
@@ -1658,6 +1719,65 @@
     min-width: 150px;
     flex: 1 1 180px;
   }
+}
+
+/* Final cross-page alignment layer. */
+.app-content > .panel:not(.applications-panel),
+.app-content > .page-scroll-panel {
+  width: 100%;
+  max-width: none;
+  padding: 0 0 28px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.app-content > .panel:not(.applications-panel) > h2:first-child {
+  margin: 0 0 22px;
+  padding: 0 0 17px;
+  border-bottom: 1px solid var(--line);
+  color: var(--navy);
+}
+
+.app-content > .panel:not(.applications-panel) > .page-actions,
+.app-content > .page-scroll-panel > .page-actions {
+  padding-top: 0;
+}
+
+.app-main .profile-panel {
+  max-width: none;
+  padding-right: 0;
+  padding-left: 0;
+}
+
+.app-main .profile-heading {
+  margin-bottom: 26px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+.app-main .application-detail,
+.app-main .application-topbar,
+.app-main .application-hero {
+  width: 100%;
+  max-width: none;
+}
+
+.app-main .application-sidebar .timeline-card {
+  min-height: 0;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.72) !important;
+}
+
+.app-main .application-sidebar .timeline-card h3,
+.app-main .application-sidebar .timeline-card strong {
+  color: var(--navy);
+}
+
+.app-main .application-sidebar .timeline-card p,
+.app-main .application-sidebar .timeline-card small {
+  color: var(--ink-soft);
 }
 
 /* Final alignment layer. */
