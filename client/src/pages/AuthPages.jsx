@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import logo from "../../images/logo.png";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import api from "../services/api";
@@ -9,6 +9,11 @@ export function Login() {
     [form, setForm] = useState({ email: "", password: "" }),
     [error, setError] = useState(""),
     [submitting, setSubmitting] = useState(false);
+  useEffect(() => {
+    // Start the API/serverless instance while the user enters credentials.
+    // This request is intentionally best-effort and does not affect sign-in.
+    api.get("/health").catch(() => {});
+  }, []);
   const submit = async (e) => {
     e.preventDefault();
     if (submitting) return;
