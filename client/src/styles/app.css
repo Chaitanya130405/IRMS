@@ -1431,6 +1431,50 @@
   box-shadow: 0 6px 18px rgba(25, 63, 101, 0.05);
 }
 
+.app-main .application-main .detail-card,
+.app-main .application-sidebar .timeline-card {
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  background: transparent !important;
+  box-shadow: none;
+  padding: 22px 0;
+}
+
+.app-main .application-main .detail-card:first-child {
+  padding-top: 0;
+}
+
+.app-main .application-main .contact-grid {
+  gap: 0 28px;
+}
+
+.app-main .application-main .contact-grid > div {
+  min-height: 82px;
+  align-content: center;
+  border-bottom: 1px solid #e4edf4;
+  border-radius: 0;
+  background: transparent;
+  padding: 15px 0;
+}
+
+.app-main .application-main .referral-facts {
+  margin-top: 22px;
+}
+
+.app-main .application-main .referral-facts > div {
+  min-height: 72px;
+}
+
+.app-main .application-sidebar .timeline-card {
+  padding-right: 0;
+  padding-left: 0;
+}
+
+.app-main .application-sidebar .timeline-card .detail-heading {
+  margin-bottom: 22px;
+}
+
 /* Final workspace system. Keep page structure open; frame only useful content. */
 *,
 *::before,
@@ -1757,6 +1801,50 @@
     min-width: 150px;
     flex: 1 1 180px;
   }
+}
+
+.app-main .application-main .detail-card,
+.app-main .application-sidebar .timeline-card {
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  background: transparent !important;
+  box-shadow: none;
+  padding: 22px 0;
+}
+
+.app-main .application-main .detail-card:first-child {
+  padding-top: 0;
+}
+
+.app-main .application-main .contact-grid {
+  gap: 0 28px;
+}
+
+.app-main .application-main .contact-grid > div {
+  min-height: 82px;
+  align-content: center;
+  border-bottom: 1px solid #e4edf4;
+  border-radius: 0;
+  background: transparent;
+  padding: 15px 0;
+}
+
+.app-main .application-main .referral-facts {
+  margin-top: 22px;
+}
+
+.app-main .application-main .referral-facts > div {
+  min-height: 72px;
+}
+
+.app-main .application-sidebar .timeline-card {
+  padding-right: 0;
+  padding-left: 0;
+}
+
+.app-main .application-sidebar .timeline-card .detail-heading {
+  margin-bottom: 22px;
 }
 
 .app-main .application-layout {
