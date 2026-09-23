@@ -1393,6 +1393,44 @@
   color: var(--ink-soft);
 }
 
+/* Application detail rail must not inherit the navigation sidebar treatment. */
+.app-main .application-layout {
+  align-items: start;
+}
+
+.app-main .application-sidebar {
+  min-width: 0;
+  background: transparent !important;
+  color: var(--ink);
+}
+
+.app-main .application-sidebar .status-editor {
+  border: 1px solid #0b5cae;
+  border-radius: 14px;
+  background: linear-gradient(145deg, #083a76, #0875e1) !important;
+  color: #fff;
+  box-shadow: 0 10px 22px rgba(8, 83, 174, 0.16);
+}
+
+.app-main .application-sidebar .status-editor h3,
+.app-main .application-sidebar .status-editor label {
+  color: #fff;
+}
+
+.app-main .application-sidebar .status-editor > p,
+.app-main .application-sidebar .status-editor label span {
+  color: #b9ddfa;
+}
+
+.app-main .application-sidebar .timeline-card {
+  overflow: visible;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.82) !important;
+  color: var(--ink);
+  box-shadow: 0 6px 18px rgba(25, 63, 101, 0.05);
+}
+
 /* Final workspace system. Keep page structure open; frame only useful content. */
 *,
 *::before,
@@ -1719,6 +1757,43 @@
     min-width: 150px;
     flex: 1 1 180px;
   }
+}
+
+.app-main .application-layout {
+  align-items: start;
+}
+
+.app-main .application-sidebar {
+  min-width: 0;
+  background: transparent !important;
+  color: var(--ink);
+}
+
+.app-main .application-sidebar .status-editor {
+  border: 1px solid #0b5cae;
+  border-radius: 14px;
+  background: linear-gradient(145deg, #083a76, #0875e1) !important;
+  color: #fff;
+  box-shadow: 0 10px 22px rgba(8, 83, 174, 0.16);
+}
+
+.app-main .application-sidebar .status-editor h3,
+.app-main .application-sidebar .status-editor label {
+  color: #fff;
+}
+
+.app-main .application-sidebar .status-editor > p,
+.app-main .application-sidebar .status-editor label span {
+  color: #b9ddfa;
+}
+
+.app-main .application-sidebar .timeline-card {
+  overflow: visible;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.82) !important;
+  color: var(--ink);
+  box-shadow: 0 6px 18px rgba(25, 63, 101, 0.05);
 }
 
 /* Final cross-page alignment layer. */
