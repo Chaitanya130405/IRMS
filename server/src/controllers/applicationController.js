@@ -1,6 +1,7 @@
 import Application from "../models/Application.js";
 import Referral from "../models/Referral.js";
 import User from "../models/User.js";
+import Job from "../models/Job.js";
 import Notification from "../models/Notification.js";
 import ActivityLog from "../models/ActivityLog.js";
 import AppError from "../utils/AppError.js";
@@ -9,7 +10,10 @@ import { notify } from "../services/notificationService.js";
 const populated = (query, includeInternalJobDetails = false) =>
   query
     .populate("candidate", "name email phone profilePicture")
-    .populate("job", includeInternalJobDetails ? undefined : "-clientName -projectName")
+    .populate(
+      "job",
+      includeInternalJobDetails ? undefined : "-clientName -projectName",
+    )
     .populate("referral");
 const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 export const createApplication = asyncHandler(async (req, res) => {
@@ -53,11 +57,9 @@ export const createApplication = asyncHandler(async (req, res) => {
     "Application submitted",
     "Your referral application has been submitted successfully.",
   );
-  res
-    .status(201)
-    .json({
-      application: await populated(Application.findById(application.id)),
-    });
+  res.status(201).json({
+    application: await populated(Application.findById(application.id)),
+  });
 });
 export const listApplications = asyncHandler(async (req, res) => {
   const {
@@ -79,17 +81,29 @@ export const listApplications = asyncHandler(async (req, res) => {
     today.setHours(0, 0, 0, 0);
     q.createdAt = { $gte: today };
   }
-  if (group === "pending") q.status = { $in: ["Applied", "Resume Under Review", "Technical Round", "HR Round"] };
+  if (group === "pending")
+    q.status = {
+      $in: ["Applied", "Resume Under Review", "Technical Round", "HR Round"],
+    };
   const jobQuery = {};
   if (department) jobQuery.department = department;
   if (location) jobQuery.location = location;
   const regex = search ? new RegExp(escapeRegex(search), "i") : null;
   const [matchingUsers, matchingJobs, matchingReferrals] = await Promise.all([
-    regex ? User.find({ $or: [{ name: regex }, { email: regex }] }).select("_id").lean() : [],
-    regex || Object.keys(jobQuery).length ? Job.find({ ...jobQuery, ...(regex ? { title: regex } : {}) }).select("_id").lean() : [],
+    regex
+      ? User.find({ $or: [{ name: regex }, { email: regex }] })
+          .select("_id")
+          .lean()
+      : [],
+    regex || Object.keys(jobQuery).length
+      ? Job.find({ ...jobQuery, ...(regex ? { title: regex } : {}) })
+          .select("_id")
+          .lean()
+      : [],
     regex ? Referral.find({ employeeId: regex }).select("_id").lean() : [],
   ]);
-  if (department || location) q.job = { $in: matchingJobs.map((job) => job._id) };
+  if (department || location)
+    q.job = { $in: matchingJobs.map((job) => job._id) };
   if (regex) {
     q.$or = [
       { applicationId: regex },
@@ -165,7 +179,9 @@ export const updateStatus = asyncHandler(async (req, res) => {
     entityType: "Application",
     entityId: app._id,
   });
-  res.json({ application: await populated(Application.findById(app.id), true) });
+  res.json({
+    application: await populated(Application.findById(app.id), true),
+  });
 });
 export const withdraw = asyncHandler(async (req, res) => {
   const app = await Application.findOne({

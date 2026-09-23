@@ -1,15 +1,16 @@
 import Job from "../models/Job.js";
 import AppError from "../utils/AppError.js";
 import asyncHandler from "../utils/asyncHandler.js";
+const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 export const listJobs = asyncHandler(async (req, res) => {
   const { status, search } = req.query;
   const q = {};
   if (status) q.status = status;
   if (search)
     q.$or = [
-      { title: new RegExp(search, "i") },
-      { jobId: new RegExp(search, "i") },
-      { department: new RegExp(search, "i") },
+      { title: new RegExp(escapeRegex(search), "i") },
+      { jobId: new RegExp(escapeRegex(search), "i") },
+      { department: new RegExp(escapeRegex(search), "i") },
     ];
   const jobs = await Job.find(q)
     .select(req.user.role === "candidate" ? "-clientName -projectName" : "")

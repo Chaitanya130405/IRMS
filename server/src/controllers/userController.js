@@ -25,8 +25,12 @@ export const listManagedUsers = asyncHandler(async (req, res) => {
       },
     ]),
   ]);
-  const jobsByAdmin = new Map(jobCounts.map((item) => [String(item._id), item.count]));
-  const activityByAdmin = new Map(activity.map((item) => [String(item._id), item]));
+  const jobsByAdmin = new Map(
+    jobCounts.map((item) => [String(item._id), item.count]),
+  );
+  const activityByAdmin = new Map(
+    activity.map((item) => [String(item._id), item]),
+  );
   res.json({
     users: users.map((user) => ({
       ...user.toObject(),
@@ -43,7 +47,10 @@ export const listCandidates = asyncHandler(async (req, res) => {
   const search = req.query.search?.trim();
   const query = { role: "candidate" };
   if (search) {
-    const match = new RegExp(search, "i");
+    const match = new RegExp(
+      search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+      "i",
+    );
     query.$or = [{ name: match }, { email: match }, { phone: match }];
   }
   const [total, candidates] = await Promise.all([
