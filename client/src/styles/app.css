@@ -1820,6 +1820,14 @@
   padding: 0;
 }
 
+.app-main .application-sidebar .timeline-card {
+  padding-left: 34px !important;
+}
+
+.app-main .application-sidebar .timeline-card .detail-heading {
+  padding-left: 0 !important;
+}
+
 .app-main .application-sidebar .timeline-card h3,
 .app-main .application-sidebar .timeline-card strong {
   color: var(--navy);
