@@ -233,7 +233,7 @@ export function Jobs({ admin = false, onlyActive = false }) {
   };
   if (form)
     return (
-      <section className="panel">
+      <section className="panel page-scroll-panel">
         <h2>{form._id ? "Edit" : "Create"} job</h2>
         <form className="form-grid" onSubmit={submit}>
           {[
@@ -295,7 +295,7 @@ export function Jobs({ admin = false, onlyActive = false }) {
   const pages = Math.ceil(visibleJobs.length / PAGE_SIZE);
   const shownJobs = visibleJobs.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
   return (
-    <>
+    <section className="page-scroll">
       <div className="page-actions">
         <div>
           <h2>{admin ? "Manage Jobs" : "Open Positions"}</h2>
@@ -344,7 +344,7 @@ export function Jobs({ admin = false, onlyActive = false }) {
       {!visibleJobs.length && !error && <p>No positions found.</p>}
       {error && <p className="error table-state">{error}</p>}
       <Pagination page={page} pages={pages} total={visibleJobs.length} onChange={setPage}/></>}
-    </>
+    </section>
   );
 }
 export function Apply() {

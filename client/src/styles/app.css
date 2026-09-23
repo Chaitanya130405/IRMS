@@ -44,7 +44,17 @@
     height: 100%;
     overflow: hidden;
   }
-  .app-content { min-height: 0; overflow-y: auto; }
+  .app-content { min-height: 0; overflow: hidden; }
+  .app-content > .panel,
+  .app-content > .page-scroll-panel {
+    max-height: 100%;
+    overflow-y: auto;
+  }
+  .app-content > .page-scroll {
+    height: 100%;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
 }
 
 /* Authenticated workspace: a small, consistent visual system for every page. */
@@ -170,6 +180,30 @@
 
 .app-header p {
   color: #667f9f;
+}
+
+@media (min-width: 1024px) {
+  .app-content > .dashboard {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .dashboard-activity {
+    flex: 1;
+    min-height: 0;
+    max-height: none;
+    overflow-y: auto !important;
+  }
+
+  .dashboard-activity .section-heading {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: #fff;
+  }
 }
 
 .app-nav a {
