@@ -1107,6 +1107,7 @@ export function Jobs({ admin = false, onlyActive = false }) {
               }
             >
               <option>Full-time</option>
+              <option>Part-time</option>
               <option>Contract</option>
               <option>Internship</option>
             </select>

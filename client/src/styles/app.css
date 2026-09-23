@@ -1310,6 +1310,115 @@
   }
 }
 
+/* Open workspace treatment: sections provide rhythm, while only useful items get frames. */
+.app-main .panel,
+.app-main .applications-panel,
+.app-main .jobs-panel,
+.app-main .page-scroll-panel {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.app-main .panel {
+  padding: 4px 0 28px;
+}
+
+.app-main .page-actions {
+  margin-bottom: 22px;
+  padding: 0 0 18px;
+  border-bottom: 1px solid #dce7f1;
+}
+
+.app-main .panel > h2:first-child,
+.app-main .form-intro {
+  margin-left: 0;
+}
+
+.app-main .dashboard-activity {
+  border-top: 1px solid #dce7f1;
+  border-radius: 0;
+  background: rgba(255, 255, 255, 0.48);
+  box-shadow: none;
+}
+
+.app-main .dashboard .card {
+  border: 1px solid #dce8f2;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: 0 6px 18px rgba(25, 63, 101, 0.045);
+}
+
+.app-main .dashboard .card:hover {
+  box-shadow: 0 10px 22px rgba(8, 117, 225, 0.1);
+}
+
+.app-main .job-grid {
+  gap: 12px;
+}
+
+.app-main .job {
+  border: 1px solid #dce7f1;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: none;
+}
+
+.app-main .job:hover {
+  border-color: #9fc8e6;
+  box-shadow: 0 8px 20px rgba(25, 63, 101, 0.07);
+}
+
+.app-main .detail-card,
+.app-main .timeline-card {
+  border: 0;
+  border-bottom: 1px solid #dce7f1;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  padding-right: 0;
+  padding-left: 0;
+}
+
+.app-main .application-hero {
+  border: 0;
+  border-bottom: 1px solid #dce7f1;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  padding-right: 0;
+  padding-left: 0;
+}
+
+.app-main .status-editor {
+  border: 1px solid #dce7f1;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: 0 6px 18px rgba(25, 63, 101, 0.05);
+}
+
+.app-main .form-section-heading {
+  border-top: 1px solid #dce7f1;
+  border-bottom: 1px solid #dce7f1;
+  border-left: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.app-main .form-intro {
+  border-bottom-color: #dce7f1;
+}
+
+.app-main table {
+  background: rgba(255, 255, 255, 0.58);
+}
+
+.app-main th {
+  border-bottom: 1px solid #dce7f1;
+  background: transparent;
+}
+
 /* Workspace visual system */
 :root {
   --ink: #10243e;
@@ -1559,6 +1668,19 @@ body {
   background: #075fae;
   box-shadow: 0 10px 21px rgba(8, 117, 225, 0.22);
   transform: translateY(-1px);
+}
+
+.app-main button:disabled,
+.app-main input:disabled,
+.app-main select:disabled {
+  cursor: not-allowed;
+  opacity: 0.62;
+}
+
+.app-main button:disabled:hover {
+  background: var(--blue);
+  box-shadow: 0 7px 16px rgba(8, 117, 225, 0.12);
+  transform: none;
 }
 
 .app-main .page-actions input,
