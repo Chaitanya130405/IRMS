@@ -1534,17 +1534,20 @@ body {
 .app-brand {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin: 0 10px 17px;
-  letter-spacing: -0.06em;
+  margin: 0 6px 26px;
 }
 
 .app-brand img {
   display: block;
-  width: 158px;
-  height: auto;
-  max-height: 48px;
-  object-fit: contain;
+  width: 170px;
+  height: 58px;
+  padding: 5px 13px;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 10px 22px rgba(1, 15, 40, 0.18);
+  object-fit: cover;
+  object-position: center 52%;
 }
 
 .app-sidebar .role {
