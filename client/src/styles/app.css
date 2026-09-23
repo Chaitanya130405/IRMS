@@ -1309,3 +1309,335 @@
     flex: 1 1 140px;
   }
 }
+
+/* Workspace visual system */
+:root {
+  --ink: #10243e;
+  --ink-soft: #667991;
+  --navy: #092c52;
+  --blue: #0875e1;
+  --sky: #eaf5ff;
+  --line: #dce7f1;
+  --canvas: #f4f8fc;
+  --coral: #ed765f;
+  --shadow-soft: 0 14px 36px rgba(25, 63, 101, 0.07);
+}
+
+body {
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: "Manrope", sans-serif;
+}
+
+.app-shell {
+  background:
+    radial-gradient(
+      circle at 84% 2%,
+      rgba(123, 203, 255, 0.15),
+      transparent 27%
+    ),
+    var(--canvas);
+}
+
+.app-sidebar {
+  width: 272px;
+  padding: 30px 18px 22px;
+  background: linear-gradient(165deg, #092f5c 0%, #061f42 58%, #04172f 100%);
+  box-shadow: 14px 0 36px rgba(3, 25, 55, 0.14);
+}
+
+.app-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 10px 17px;
+  letter-spacing: -0.06em;
+}
+
+.app-brand-mark {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border-radius: 11px;
+  background: var(--coral);
+  color: #fff;
+  font-size: 21px;
+  font-weight: 800;
+  letter-spacing: -0.08em;
+  box-shadow: 0 8px 18px rgba(237, 118, 95, 0.25);
+}
+
+.app-brand > span:last-child {
+  color: #fff;
+  font-size: 27px;
+  font-weight: 800;
+}
+
+.app-brand > span:last-child span {
+  color: #78c7ff;
+}
+
+.app-sidebar .role {
+  margin: 0 10px 22px;
+  padding: 0 0 15px;
+  color: #8dd1ff;
+  letter-spacing: 0.16em;
+}
+
+.app-sidebar > div:nth-of-type(2) {
+  margin-bottom: 22px;
+  border: 1px solid rgba(155, 211, 249, 0.2);
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.app-sidebar .app-nav {
+  gap: 7px;
+}
+
+.app-sidebar .app-nav a {
+  min-height: 45px;
+  display: flex;
+  align-items: center;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  color: #a9c3df;
+  font-size: 13px;
+  letter-spacing: 0.01em;
+}
+
+.app-sidebar .app-nav a::before {
+  width: 7px;
+  height: 7px;
+  margin-right: 13px;
+  border-radius: 3px;
+  color: #69bfff;
+  transform: rotate(45deg);
+}
+
+.app-sidebar .app-nav a:hover {
+  border-color: rgba(151, 211, 249, 0.18);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.app-sidebar .app-nav a[aria-current="page"] {
+  border-color: rgba(255, 255, 255, 0.52);
+  background: #fff;
+  color: #0968c6;
+  box-shadow: 0 10px 22px rgba(1, 15, 40, 0.24);
+}
+
+.app-sidebar > button:last-child {
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #d6e8f8;
+}
+
+.app-sidebar > button:last-child:hover {
+  background: rgba(237, 118, 95, 0.92);
+}
+
+.app-main {
+  background:
+    radial-gradient(
+      circle at 100% 0%,
+      rgba(120, 194, 255, 0.14),
+      transparent 26%
+    ),
+    radial-gradient(
+      circle at 0% 100%,
+      rgba(225, 238, 252, 0.68),
+      transparent 30%
+    ),
+    var(--canvas);
+}
+
+.app-header {
+  min-height: 112px;
+  border-bottom: 1px solid rgba(196, 215, 232, 0.8);
+  background: rgba(244, 248, 252, 0.72);
+}
+
+.workspace-kicker {
+  margin: 0 0 6px;
+  color: var(--blue) !important;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+}
+
+.app-header h1 {
+  color: var(--navy);
+  font-size: clamp(24px, 2.2vw, 31px);
+  letter-spacing: -0.055em;
+}
+
+.header-context {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #d9e8f4;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.78);
+  padding: 9px 13px;
+  color: #55718e;
+  font-size: 11px;
+  font-weight: 800;
+  box-shadow: 0 5px 15px rgba(25, 63, 101, 0.05);
+}
+
+.header-context-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #27b47b;
+  box-shadow: 0 0 0 4px #e1f7ed;
+}
+
+.app-content {
+  scrollbar-color: #a7c5dc transparent;
+  scrollbar-width: thin;
+}
+
+.app-content::-webkit-scrollbar,
+.panel-content-scroll::-webkit-scrollbar,
+.page-scroll-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.app-content::-webkit-scrollbar-thumb,
+.panel-content-scroll::-webkit-scrollbar-thumb,
+.page-scroll-content::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: #a7c5dc;
+  background-clip: padding-box;
+}
+
+.app-main .panel,
+.app-main .job,
+.app-main .detail-card,
+.app-main .timeline-card {
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  box-shadow: var(--shadow-soft);
+}
+
+.app-main .panel {
+  background: rgba(255, 255, 255, 0.93);
+}
+
+.app-main .page-actions {
+  margin-bottom: 25px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e8eff5;
+}
+
+.app-main .page-actions h2,
+.app-main .panel h2 {
+  color: var(--navy);
+  letter-spacing: -0.045em;
+}
+
+.app-main .page-actions p {
+  color: var(--ink-soft);
+}
+
+.app-main button:not(.sidebar-close):not(.sidebar-menu-trigger),
+.app-main .button {
+  min-height: 42px;
+  border-radius: 11px;
+  background: var(--blue);
+  box-shadow: 0 7px 16px rgba(8, 117, 225, 0.16);
+}
+
+.app-main button:not(.sidebar-close):not(.sidebar-menu-trigger):hover,
+.app-main .button:hover {
+  background: #075fae;
+  box-shadow: 0 10px 21px rgba(8, 117, 225, 0.22);
+  transform: translateY(-1px);
+}
+
+.app-main .page-actions input,
+.app-main .page-actions select {
+  min-height: 42px;
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.app-main table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.app-main th {
+  background: #f2f7fb;
+  color: #68809a;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+}
+
+.app-main td {
+  color: #29425f;
+}
+
+.app-main tbody tr {
+  transition: background-color 150ms ease;
+}
+
+.app-main tbody tr:hover {
+  background: #f7fbfe;
+}
+
+.app-main .job {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(145deg, #fff 0%, #f8fbfe 100%);
+}
+
+.app-main .job::before {
+  height: 3px;
+  background: linear-gradient(90deg, var(--blue), #7ccfff 65%, var(--coral));
+}
+
+.app-main .job h2 {
+  color: var(--navy);
+  letter-spacing: -0.04em;
+}
+
+.app-main .badge {
+  border: 1px solid transparent;
+  font-size: 10px;
+  letter-spacing: 0.03em;
+}
+
+.app-main .application-page-controls {
+  align-items: center;
+}
+
+.app-main .application-page-controls button:last-child {
+  background: #eaf3fb;
+  color: #1b5d94;
+  box-shadow: none;
+}
+
+.app-main .application-page-controls button:last-child:hover {
+  background: #dcecf8;
+}
+
+@media (max-width: 639px) {
+  .header-context {
+    display: none;
+  }
+
+  .app-header {
+    min-height: 92px;
+  }
+
+  .app-main .page-actions {
+    padding-bottom: 14px;
+  }
+}
