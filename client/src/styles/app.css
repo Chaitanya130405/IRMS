@@ -48,7 +48,7 @@
   .app-content > .panel,
   .app-content > .page-scroll-panel {
     max-height: 100%;
-    overflow-y: auto;
+    overflow: hidden;
   }
   .app-content > .page-scroll {
     height: 100%;
