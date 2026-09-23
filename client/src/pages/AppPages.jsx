@@ -1025,7 +1025,7 @@ export function Jobs({ admin = false, onlyActive = false }) {
   const pages = Math.ceil(visibleJobs.length / PAGE_SIZE);
   const shownJobs = visibleJobs.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
   return (
-    <section className="page-scroll">
+    <section className="page-scroll jobs-panel">
       <div className="page-actions">
         <div>
           <h2>{admin ? "Manage Jobs" : "Open Positions"}</h2>
