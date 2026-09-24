@@ -21,7 +21,7 @@ const downloadCsv = (filename, headers, rows) => {
   URL.revokeObjectURL(url);
 };
 
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 6;
 
 // ═══════════════════════════════════════════════════════════════════════════
 // ICONS
@@ -294,6 +294,26 @@ function ErrorState({ title = "Something went wrong", message, onRetry }) {
   );
 }
 
+function ConfirmModal({ isOpen, title, message, confirmText = "Confirm", cancelText = "Cancel", onConfirm, onCancel, danger = false }) {
+  if (!isOpen) return null;
+  
+  return (
+    <div className="modal-backdrop" onClick={onCancel}>
+      <div className="confirm-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="confirm-modal-icon">
+          {danger ? <Icons.AlertCircle /> : <Icons.AlertCircle />}
+        </div>
+        <h3 className="confirm-modal-title">{title}</h3>
+        <p className="confirm-modal-message">{message}</p>
+        <div className="confirm-modal-actions">
+          <button className="btn btn-secondary" onClick={onCancel}>{cancelText}</button>
+          <button className={`btn ${danger ? "btn-danger" : "btn-primary"}`} onClick={onConfirm}>{confirmText}</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function SearchBar({ value, onChange, onSearch, placeholder = "Search..." }) {
   return (
     <div className="search-bar">
@@ -504,6 +524,7 @@ export function Notifications() {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
 
   const loadNotifications = () => {
     setLoading(true);
@@ -542,12 +563,13 @@ export function Notifications() {
 
   // Clear all notifications
   const handleClearAll = async () => {
-    if (!window.confirm("Are you sure you want to delete all notifications? This cannot be undone.")) return;
     try {
       await api.delete("/notifications/clear-all");
       setNotifications([]);
+      setShowClearConfirm(false);
     } catch (e) {
       setError(e.response?.data?.message || "Failed to clear notifications");
+      setShowClearConfirm(false);
     }
   };
 
@@ -566,12 +588,23 @@ export function Notifications() {
             </button>
           )}
           {notifications.length > 0 && (
-            <button className="btn btn-sm btn-outline" onClick={handleClearAll}>
+            <button className="btn btn-sm btn-outline" onClick={() => setShowClearConfirm(true)}>
               Clear all
             </button>
           )}
         </div>
       </PageHeader>
+
+      <ConfirmModal
+        isOpen={showClearConfirm}
+        title="Clear All Notifications"
+        message="Are you sure you want to delete all notifications? This action cannot be undone."
+        confirmText="Delete All"
+        cancelText="Cancel"
+        danger={true}
+        onConfirm={handleClearAll}
+        onCancel={() => setShowClearConfirm(false)}
+      />
 
       <Card>
         {loading ? (
