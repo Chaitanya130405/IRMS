@@ -1083,10 +1083,11 @@
 }
 
 .app-main .table-state {
-  margin: 24px 0 4px;
+  margin: 22px 0 0;
+  padding-left: 10px;
   color: #667b96;
   font-weight: 600;
-  text-align: center;
+  text-align: left;
 }
 
 .table-skeleton {
@@ -1512,7 +1513,7 @@
 }
 
 .app-main .panel {
-  padding: 4px 0 28px;
+  padding: 4px 0 44px;
 }
 
 .app-main .page-actions {
@@ -1819,6 +1820,7 @@
     flex: 1 1 auto;
     min-height: 0;
     overflow: auto;
+    padding-bottom: 20px;
     border: 1px solid #dce7f1;
     border-radius: 12px;
     background: rgba(255, 255, 255, 0.65);
@@ -1841,6 +1843,28 @@
   .applications-panel .application-page-controls select {
     min-width: 150px;
     flex: 1 1 180px;
+  }
+}
+
+/* Keep application results comfortably inside the framed content area. */
+.applications-panel .panel-content-scroll {
+  padding: 0 14px 24px;
+}
+
+.applications-panel .pagination,
+.applications-panel .pagination-summary {
+  margin-right: 0;
+  margin-left: 0;
+}
+
+.applications-panel .pagination-summary {
+  padding-bottom: 2px;
+}
+
+@media (max-width: 639px) {
+  .applications-panel .panel-content-scroll {
+    padding-right: 10px;
+    padding-left: 10px;
   }
 }
 

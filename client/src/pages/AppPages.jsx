@@ -21,7 +21,7 @@ function Pagination({ page, pages, total, onChange }) {
   if (pages <= 1)
     return total ? (
       <p className="pagination-summary">
-         Showing {total} result{total === 1 ? "" : "s"}
+        Showing {total} result{total === 1 ? "" : "s"}
       </p>
     ) : null;
   const numbers = Array.from({ length: pages }, (_, index) => index + 1).filter(
@@ -44,7 +44,6 @@ function Pagination({ page, pages, total, onChange }) {
         </button>
         {numbers.map((number, index) => (
           <React.Fragment key={number}>
-            {index > 0 && numbers[index - 1] !== number - 1 && <i>…</i>}
             <button
               type="button"
               className={number === page ? "active" : ""}
@@ -1276,14 +1275,25 @@ export function Apply() {
   }, []);
   const set = (k, v) => setF({ ...f, [k]: v });
   const [duplicateMessage, setDuplicateMessage] = useState("");
+  const [duplicateChecks, setDuplicateChecks] = useState({
+    candidate: "Not checked",
+    referral: "Not checked",
+  });
   const [checkingDuplicate, setCheckingDuplicate] = useState(false);
   const checkDuplicate = async () => {
-    if (!f.candidateContact || !f.job) return false;
+    if (!f.candidateContact || !f.job) {
+      setDuplicateChecks({ candidate: "Not checked", referral: "Not checked" });
+      return false;
+    }
     setCheckingDuplicate(true);
     setDuplicateMessage("");
     try {
       const { data } = await api.get("/applications/check-duplicate", {
         params: { candidateContact: f.candidateContact, job: f.job },
+      });
+      setDuplicateChecks({
+        candidate: data.candidateExists ? "Match found" : "No match found",
+        referral: data.referralExists ? "Match found" : "No match found",
       });
       if (data.referralExists) {
         setDuplicateMessage(
@@ -1301,6 +1311,10 @@ export function Apply() {
       }
       return false;
     } catch (error) {
+      setDuplicateChecks({
+        candidate: "Check unavailable",
+        referral: "Check unavailable",
+      });
       setDuplicateMessage(
         error.response?.data?.message ||
           "Could not check for duplicate candidates.",
@@ -1407,7 +1421,7 @@ export function Apply() {
         ))}
         <div className="form-section-heading">Candidate details</div>
         <label>
-          Candidate phone number or email
+          Candidate contact number / email
           <input
             required
             value={f.candidateContact}
@@ -1482,6 +1496,14 @@ export function Apply() {
         <label>
           Referral status
           <input value="Applied - tracked by recruitment workflow" readOnly />
+        </label>
+        <label>
+          Duplicate candidate check
+          <input value={duplicateChecks.candidate} readOnly />
+        </label>
+        <label>
+          Duplicate referral check
+          <input value={duplicateChecks.referral} readOnly />
         </label>
         {duplicateMessage && (
           <p className="error form-section-wide">{duplicateMessage}</p>
@@ -1706,8 +1728,10 @@ export function Applications({ admin = false, insight }) {
             <p>Candidate applications and contact details</p>
           )}
         </div>
-        <div className="application-page-controls">
+        <div className="application-page-controls" role="search">
           <input
+            type="search"
+            aria-label="Search applications"
             placeholder="Search"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -1736,6 +1760,7 @@ export function Applications({ admin = false, insight }) {
             ))}
           </select>
           <button
+            type="button"
             onClick={() => {
               setPage(1);
               load(1);
