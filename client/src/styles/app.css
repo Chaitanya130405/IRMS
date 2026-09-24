@@ -1762,15 +1762,16 @@
     flex: 0 0 auto;
     flex-direction: row;
     align-items: center;
+    justify-content: space-between;
     flex-wrap: nowrap;
-    gap: 24px;
+    gap: 20px;
     margin: 0 0 18px;
     padding: 0 0 16px;
     border-bottom: 1px solid #dce7f1;
   }
 
   .applications-panel > .page-actions > div:first-child {
-    min-width: 190px;
+    min-width: 180px;
     flex: 1 1 auto;
   }
 
@@ -1779,15 +1780,39 @@
     flex: 0 1 auto;
     flex-wrap: nowrap;
     align-items: center;
-    gap: 8px;
+    justify-content: flex-end;
+    gap: 10px;
+    min-width: 0;
+  }
+
+  .applications-panel .application-page-controls > * {
+    display: flex;
+    align-items: center;
+    height: 44px;
+    box-sizing: border-box;
+    border-radius: 12px;
+  }
+
+  .applications-panel .application-page-controls input,
+  .applications-panel .application-page-controls select,
+  .applications-panel .application-page-controls button {
+    margin: 0;
+    line-height: 1.2;
   }
 
   .applications-panel .application-page-controls input {
     width: 220px;
+    min-width: 0;
   }
 
   .applications-panel .application-page-controls select {
     width: 170px;
+    min-width: 0;
+  }
+
+  .applications-panel .application-page-controls button {
+    white-space: nowrap;
+    padding-inline: 20px;
   }
 
   .applications-panel .panel-content-scroll {
