@@ -1262,6 +1262,14 @@ export function Apply() {
       coverLetter: "",
       additionalNotes: "",
     });
+  const [filledAt] = useState(() => new Date());
+  const filledAtLabel = filledAt.toLocaleString(undefined, {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
   useEffect(() => {
     api
       .get("/jobs?status=active")
@@ -1375,8 +1383,8 @@ export function Apply() {
         <p className="section-label">EMPLOYEE REFERRAL</p>
         <h2>Submit referral application</h2>
         <p>
-          Share a strong candidate with the hiring team. Referral date and
-          status are captured automatically.
+          Share a strong candidate with the hiring team. The filling date is
+          recorded when you submit.
         </p>
       </div>
       <form className="form-grid" onSubmit={submit}>
@@ -1491,11 +1499,7 @@ export function Apply() {
         </label>
         <label>
           Referral date & time
-          <input value="Captured automatically on submission" readOnly />
-        </label>
-        <label>
-          Referral status
-          <input value="Applied - tracked by recruitment workflow" readOnly />
+          <input value={filledAtLabel} readOnly aria-readonly="true" />
         </label>
         <label>
           Duplicate candidate check
