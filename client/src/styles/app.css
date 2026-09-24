@@ -1868,6 +1868,27 @@
   }
 }
 
+@media (min-width: 1024px) {
+  .applications-panel > .page-actions > .application-page-controls {
+    width: auto;
+    max-width: 100%;
+  }
+
+  .applications-panel .application-page-controls input {
+    width: 220px;
+    min-width: 180px;
+    flex: 0 1 220px;
+  }
+
+  .applications-panel .application-page-controls select {
+    flex: 0 0 170px;
+  }
+
+  .applications-panel .application-page-controls button {
+    flex: 0 0 auto;
+  }
+}
+
 /* Final application rail cleanup. */
 .app-main .application-sidebar .timeline-card {
   margin: 0;
@@ -2541,20 +2562,21 @@ body {
 .app-brand {
   display: flex;
   align-items: center;
+  justify-content: center;
   margin: 0 6px 26px;
 }
 
 .app-brand img {
   display: block;
   width: 170px;
-  height: 58px;
-  padding: 5px 13px;
+  height: 170px;
+  padding: 16px;
   border: 1px solid rgba(255, 255, 255, 0.72);
-  border-radius: 10px;
+  border-radius: 16px;
   background: #fff;
   box-shadow: 0 10px 22px rgba(1, 15, 40, 0.18);
-  object-fit: cover;
-  object-position: center 52%;
+  object-fit: contain;
+  object-position: center;
 }
 
 .app-sidebar .role {

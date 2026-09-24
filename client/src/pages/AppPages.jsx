@@ -1283,25 +1283,14 @@ export function Apply() {
   }, []);
   const set = (k, v) => setF({ ...f, [k]: v });
   const [duplicateMessage, setDuplicateMessage] = useState("");
-  const [duplicateChecks, setDuplicateChecks] = useState({
-    candidate: "Not checked",
-    referral: "Not checked",
-  });
   const [checkingDuplicate, setCheckingDuplicate] = useState(false);
   const checkDuplicate = async () => {
-    if (!f.candidateContact || !f.job) {
-      setDuplicateChecks({ candidate: "Not checked", referral: "Not checked" });
-      return false;
-    }
+    if (!f.candidateContact || !f.job) return false;
     setCheckingDuplicate(true);
     setDuplicateMessage("");
     try {
       const { data } = await api.get("/applications/check-duplicate", {
         params: { candidateContact: f.candidateContact, job: f.job },
-      });
-      setDuplicateChecks({
-        candidate: data.candidateExists ? "Match found" : "No match found",
-        referral: data.referralExists ? "Match found" : "No match found",
       });
       if (data.referralExists) {
         setDuplicateMessage(
@@ -1319,10 +1308,6 @@ export function Apply() {
       }
       return false;
     } catch (error) {
-      setDuplicateChecks({
-        candidate: "Check unavailable",
-        referral: "Check unavailable",
-      });
       setDuplicateMessage(
         error.response?.data?.message ||
           "Could not check for duplicate candidates.",
@@ -1500,14 +1485,6 @@ export function Apply() {
         <label>
           Referral date & time
           <input value={filledAtLabel} readOnly aria-readonly="true" />
-        </label>
-        <label>
-          Duplicate candidate check
-          <input value={duplicateChecks.candidate} readOnly />
-        </label>
-        <label>
-          Duplicate referral check
-          <input value={duplicateChecks.referral} readOnly />
         </label>
         {duplicateMessage && (
           <p className="error form-section-wide">{duplicateMessage}</p>
