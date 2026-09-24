@@ -21,7 +21,7 @@ function Pagination({ page, pages, total, onChange }) {
   if (pages <= 1)
     return total ? (
       <p className="pagination-summary">
-        Showing {total} result{total === 1 ? "" : "s"}
+         Showing {total} result{total === 1 ? "" : "s"}
       </p>
     ) : null;
   const numbers = Array.from({ length: pages }, (_, index) => index + 1).filter(
