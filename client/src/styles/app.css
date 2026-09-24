@@ -2568,11 +2568,11 @@ body {
 
 .app-brand img {
   display: block;
-  width: 170px;
-  height: 170px;
-  padding: 16px;
+  width: 128px;
+  height: 128px;
+  padding: 12px;
   border: 1px solid rgba(255, 255, 255, 0.72);
-  border-radius: 16px;
+  border-radius: 14px;
   background: #fff;
   box-shadow: 0 10px 22px rgba(1, 15, 40, 0.18);
   object-fit: contain;
@@ -2899,6 +2899,11 @@ body {
   .app-main .page-actions {
     padding-bottom: 14px;
   }
+
+  .applications-panel .panel-content-scroll {
+    padding-right: 10px;
+    padding-left: 10px;
+  }
 }
 
 @media (min-width: 1024px) {
@@ -2998,5 +3003,49 @@ body {
   .applications-panel .application-page-controls select {
     min-width: 150px;
     flex: 1 1 180px;
+  }
+}
+
+/* Keep application results comfortably inside the framed content area. */
+.applications-panel .panel-content-scroll {
+  padding: 0 14px 24px;
+}
+
+.applications-panel .pagination,
+.applications-panel .pagination-summary {
+  margin-right: 0;
+  margin-left: 0;
+}
+
+.applications-panel .pagination-summary {
+  padding-bottom: 2px;
+}
+
+@media (max-width: 639px) {
+  .applications-panel .panel-content-scroll {
+    padding-right: 10px;
+    padding-left: 10px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .app-main .applications-panel > .page-actions > .application-page-controls {
+    width: auto;
+    max-width: 100%;
+  }
+
+  .app-main .applications-panel .application-page-controls input {
+    width: 220px;
+    min-width: 180px;
+    flex: 0 1 220px;
+    flex-shrink: 1;
+  }
+
+  .app-main .applications-panel .application-page-controls select {
+    flex: 0 0 170px;
+  }
+
+  .app-main .applications-panel .application-page-controls button {
+    flex: 0 0 auto;
   }
 }
