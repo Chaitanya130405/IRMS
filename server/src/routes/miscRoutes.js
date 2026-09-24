@@ -5,6 +5,8 @@ import { updateProfile } from "../controllers/profileController.js";
 import {
   listNotifications,
   readNotification,
+  markAllRead,
+  clearAllNotifications,
 } from "../controllers/notificationController.js";
 import {
   createAdmin,
@@ -17,6 +19,8 @@ r.use(protect);
 r.get("/dashboard", authorize("candidate", "admin"), dashboard);
 r.patch("/profile", updateProfile);
 r.get("/notifications", listNotifications);
+r.patch("/notifications/mark-all-read", markAllRead);
+r.delete("/notifications/clear-all", clearAllNotifications);
 r.patch("/notifications/:id/read", readNotification);
 r.get("/users", authorize("superadmin"), listManagedUsers);
 r.get("/candidates", authorize("admin"), listCandidates);

@@ -3,7 +3,9 @@
   "private": true,
   "scripts": {
     "server": "npm --prefix server run dev",
+    "server:prod": "npm --prefix server run start",
     "client": "npm --prefix client run dev",
+    "client:build": "npm --prefix client run build",
     "install:all": "npm install && npm --prefix server install && npm --prefix client install"
   }
 }
