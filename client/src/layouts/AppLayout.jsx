@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { NavLink, Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import api from "../services/api";
 import logo from "../../images/logo.png";
 
 // Navigation items for each role
@@ -297,6 +298,25 @@ export default function AppLayout() {
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  // Fetch unread notification count
+  useEffect(() => {
+    const fetchUnreadCount = async () => {
+      try {
+        const { data } = await api.get("/notifications");
+        const unread = data.notifications?.filter(n => !n.read).length || 0;
+        setUnreadCount(unread);
+      } catch (e) {
+        // Silently fail - don't break the app for badge
+      }
+    };
+    
+    fetchUnreadCount();
+    // Refresh count when navigating (in case user marked notifications as read)
+    const interval = setInterval(fetchUnreadCount, 30000); // Refresh every 30s
+    return () => clearInterval(interval);
+  }, [location.pathname]);
 
   // Close mobile menu on route change
   useEffect(() => {
@@ -421,7 +441,12 @@ export default function AppLayout() {
               end={item.to === "/admin" || item.to === "/dashboard" || item.to === "/superadmin"}
               className={({ isActive }) => `nav-link ${isActive ? "active" : ""}`}
             >
-              <span className="nav-icon">{item.icon}</span>
+              <span className="nav-icon">
+                {item.icon}
+                {item.label === "Notifications" && unreadCount > 0 && (
+                  <span className="nav-badge-dot" />
+                )}
+              </span>
               <span className="nav-label">{item.label}</span>
               <span className="nav-indicator" />
             </NavLink>
@@ -503,7 +528,7 @@ export default function AppLayout() {
                 <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" />
                 <path d="M13.73 21a2 2 0 01-3.46 0" />
               </svg>
-              <span className="notification-dot" />
+              {unreadCount > 0 && <span className="notification-dot" />}
             </button>
 
             {/* Profile button */}

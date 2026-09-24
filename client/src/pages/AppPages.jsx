@@ -1250,6 +1250,21 @@ export function ApplicationDetails() {
   const [remarks, setRemarks] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [showWithdrawConfirm, setShowWithdrawConfirm] = useState(false);
+
+  const handleWithdraw = async () => {
+    setSaving(true);
+    setError("");
+    setShowWithdrawConfirm(false);
+    try {
+      const r = await api.patch(`/applications/${id}/withdraw`);
+      setApp(r.data.application);
+    } catch (e) {
+      setError(e.response?.data?.message || "Could not withdraw application");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   useEffect(() => {
     api.get(`/applications/${id}`)
@@ -1378,19 +1393,7 @@ export function ApplicationDetails() {
                 {error && <div className="form-message error">{error}</div>}
                 <button 
                   className="btn btn-danger" 
-                  onClick={async () => {
-                    if (!window.confirm("Are you sure you want to withdraw this application? This cannot be undone.")) return;
-                    setSaving(true);
-                    setError("");
-                    try {
-                      const r = await api.patch(`/applications/${id}/withdraw`);
-                      setApp(r.data.application);
-                    } catch (e) {
-                      setError(e.response?.data?.message || "Could not withdraw application");
-                    } finally {
-                      setSaving(false);
-                    }
-                  }} 
+                  onClick={() => setShowWithdrawConfirm(true)} 
                   disabled={saving}
                 >
                   {saving ? "Withdrawing..." : "Withdraw Application"}
@@ -1398,6 +1401,17 @@ export function ApplicationDetails() {
               </div>
             </Card>
           )}
+
+          <ConfirmModal
+            isOpen={showWithdrawConfirm}
+            title="Withdraw Application"
+            message="Are you sure you want to withdraw this application? This action cannot be undone."
+            confirmText="Withdraw"
+            cancelText="Cancel"
+            danger={true}
+            onConfirm={handleWithdraw}
+            onCancel={() => setShowWithdrawConfirm(false)}
+          />
 
           <Card>
             <div className="card-header"><h3>Status History</h3></div>
