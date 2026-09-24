@@ -101,7 +101,13 @@
     @apply m-0 text-[23px] font-bold;
   }
   .page-actions > div:last-child {
-    @apply flex flex-wrap gap-2;
+    @apply flex w-full flex-wrap items-center justify-end gap-2;
+  }
+  .page-actions > div:last-child input {
+    @apply min-w-[180px] flex-1;
+  }
+  .page-actions > div:last-child button {
+    @apply shrink-0;
   }
   .notification {
     @apply mb-3 rounded-xl border border-[#e1ebf5] bg-white p-5 shadow-[0_6px_18px_rgba(23,57,98,.05)] transition hover:-translate-y-px hover:border-[#a9d8ff] hover:shadow-[0_10px_22px_rgba(8,117,225,.09)];
@@ -998,6 +1004,15 @@
 
 .app-main .page-actions {
   min-height: 50px;
+}
+
+.app-main .page-actions > div:last-child {
+  width: min(100%, 420px);
+  margin-left: auto;
+}
+
+.app-main .page-actions > div:last-child input {
+  min-width: 0;
 }
 
 .app-main .application-page-controls {
