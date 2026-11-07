@@ -2,11 +2,11 @@ import Application from "../models/Application.js";
 import Referral from "../models/Referral.js";
 import User from "../models/User.js";
 import Job from "../models/Job.js";
-import Notification from "../models/Notification.js";
 import ActivityLog from "../models/ActivityLog.js";
 import AppError from "../utils/AppError.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import { notify } from "../services/notificationService.js";
+import { escapeRegex } from "../utils/helpers.js";
 const populated = (query, includeInternalJobDetails = false) =>
   query
     .populate("candidate", "name email phone profilePicture")
@@ -15,7 +15,7 @@ const populated = (query, includeInternalJobDetails = false) =>
       includeInternalJobDetails ? undefined : "-clientName -projectName",
     )
     .populate("referral");
-const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
 const contactQuery = (contact) => {
   const value = contact.trim().toLowerCase();
   return { $or: [{ email: value }, { phone: contact.trim() }] };
@@ -51,6 +51,12 @@ export const checkDuplicate = asyncHandler(async (req, res) => {
 export const createApplication = asyncHandler(async (req, res) => {
   if (!req.file) throw new AppError("Resume is required");
   const { job, referral, coverLetter, additionalNotes } = req.body;
+
+  // Validate job exists and is active
+  const jobDoc = await Job.findById(job).select("status").lean();
+  if (!jobDoc) throw new AppError("Job not found", 404);
+  if (jobDoc.status !== "active") throw new AppError("This job is no longer accepting applications", 400);
+
   const exists = await Application.findOne({ candidate: req.user.id, job });
   if (exists) throw new AppError("You have already applied for this job", 409);
   let referralData;
@@ -134,7 +140,7 @@ export const listApplications = asyncHandler(async (req, res) => {
     limit = 10,
   } = req.query;
   const pageNumber = Math.max(Number(page) || 1, 1);
-  const pageSize = Math.min(Math.max(Number(limit) || 10, 1), 10000);
+  const pageSize = Math.min(Math.max(Number(limit) || 10, 1), 100);
   const q = req.user.role === "candidate" ? { candidate: req.user.id } : {};
   if (status) q.status = status;
   if (period === "today") {
@@ -250,7 +256,7 @@ export const withdraw = asyncHandler(async (req, res) => {
     candidate: req.user.id,
   });
   if (!app) throw new AppError("Application not found", 404);
-  if (["Joined", "Rejected"].includes(app.status))
+  if (["Joined", "Rejected", "Withdrawn"].includes(app.status))
     throw new AppError("This application cannot be withdrawn");
   app.status = "Withdrawn";
   app.statusHistory.push({

@@ -274,7 +274,7 @@ function AuthShell({ title, subtitle, children }) {
 export function Login() {
   const { login } = useAuth();
   const nav = useNavigate();
-  const [form, setForm] = useState({ email: "", password: "" });
+  const [form, setForm] = useState({ email: "", password: "", rememberMe: false });
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -290,7 +290,7 @@ export function Login() {
     setError("");
     
     try {
-      const u = await login(form);
+      const u = await login({ email: form.email, password: form.password }, form.rememberMe);
       nav(
         u.role === "superadmin" ? "/superadmin" : 
         u.role === "admin" ? "/admin" : "/dashboard",
@@ -337,7 +337,11 @@ export function Login() {
 
         <div className="auth-options">
           <label className="remember-me">
-            <input type="checkbox" />
+            <input 
+              type="checkbox" 
+              checked={form.rememberMe}
+              onChange={(e) => setForm({ ...form, rememberMe: e.target.checked })}
+            />
             <span>Remember me</span>
           </label>
           <Link to="/forgot-password" className="forgot-link">
@@ -484,7 +488,7 @@ export function Register() {
           <label className="terms-check">
             <input type="checkbox" required />
             <span>
-              I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+              I agree to the <Link to="/terms">Terms of Service</Link> and <Link to="/privacy">Privacy Policy</Link>
             </span>
           </label>
         </div>

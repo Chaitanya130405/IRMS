@@ -1,11 +1,12 @@
 import Notification from "../models/Notification.js";
 import asyncHandler from "../utils/asyncHandler.js";
+import AppError from "../utils/AppError.js";
 
 export const listNotifications = asyncHandler(async (req, res) =>
   res.json({
-    notifications: await Notification.find({ user: req.user.id }).sort(
-      "-createdAt",
-    ),
+    notifications: await Notification.find({ user: req.user.id })
+      .sort("-createdAt")
+      .lean(),
   }),
 );
 
@@ -15,6 +16,7 @@ export const readNotification = asyncHandler(async (req, res) => {
     { read: true },
     { new: true },
   );
+  if (!n) throw new AppError("Notification not found", 404);
   res.json({ notification: n });
 });
 

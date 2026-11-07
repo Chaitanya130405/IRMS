@@ -3,6 +3,9 @@ import User from "../models/User.js";
 import AppError from "../utils/AppError.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import { signToken } from "../utils/token.js";
+import TokenBlacklist from "../models/TokenBlacklist.js";
+import jwt from "jsonwebtoken";
+import logger from "../utils/logger.js";
 const respond = (user, res, status = 200) =>
   res
     .status(status)
@@ -34,7 +37,7 @@ export const login = asyncHandler(async (req, res) => {
     throw new AppError("Account unavailable", 401);
   // Login analytics must not hold up the authentication response.
   void User.updateOne({ _id: user._id }, { $set: { lastLogin: new Date() } }).catch(
-    (error) => console.error("Could not update last login", error),
+    (error) => logger.warn("Could not update last login", error.message),
   );
   respond(user, res);
 });
@@ -64,9 +67,12 @@ export const forgotPassword = asyncHandler(async (req, res) => {
     .digest("hex");
   user.resetPasswordExpires = Date.now() + 3600000;
   await user.save({ validateBeforeSave: false });
+  // In production, send email with reset link. Token logged for dev debugging only.
+  if (process.env.NODE_ENV !== "production") {
+    logger.debug(`Password reset token for ${user.email}: ${token}`);
+  }
   res.json({
-    message: "Use the button below to choose a new password.",
-    resetToken: process.env.NODE_ENV === "development" ? token : undefined,
+    message: "If this email exists, a reset link has been sent.",
   });
 });
 export const resetPassword = asyncHandler(async (req, res) => {
@@ -84,4 +90,19 @@ export const resetPassword = asyncHandler(async (req, res) => {
   user.resetPasswordExpires = undefined;
   await user.save();
   respond(user, res);
+});
+
+export const logout = asyncHandler(async (req, res) => {
+  const token = req.token;
+  if (token) {
+    // Decode token to get expiration time
+    const decoded = jwt.decode(token);
+    const expiresAt = decoded?.exp ? new Date(decoded.exp * 1000) : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    
+    // Add token to blacklist
+    await TokenBlacklist.create({ token, expiresAt }).catch(() => {
+      // Ignore duplicate key errors (token already blacklisted)
+    });
+  }
+  res.json({ message: "Logged out successfully" });
 });

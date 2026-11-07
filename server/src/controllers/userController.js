@@ -7,7 +7,8 @@ import asyncHandler from "../utils/asyncHandler.js";
 export const listManagedUsers = asyncHandler(async (req, res) => {
   const users = await User.find({ role: "admin" })
     .select("name email phone role status createdAt lastLogin")
-    .sort("-createdAt");
+    .sort("-createdAt")
+    .lean();
   const ids = users.map((user) => user._id);
   const [jobCounts, activity] = await Promise.all([
     Job.aggregate([
@@ -33,7 +34,7 @@ export const listManagedUsers = asyncHandler(async (req, res) => {
   );
   res.json({
     users: users.map((user) => ({
-      ...user.toObject(),
+      ...user,
       jobsCreated: jobsByAdmin.get(String(user._id)) || 0,
       actionsTaken: activityByAdmin.get(String(user._id))?.actions || 0,
       lastActivity: activityByAdmin.get(String(user._id))?.lastActivity || null,
@@ -59,7 +60,8 @@ export const listCandidates = asyncHandler(async (req, res) => {
       .select("name email phone status createdAt lastLogin")
       .sort("-createdAt")
       .skip((page - 1) * limit)
-      .limit(limit),
+      .limit(limit)
+      .lean(),
   ]);
   res.json({ candidates, total, page, pages: Math.ceil(total / limit) });
 });

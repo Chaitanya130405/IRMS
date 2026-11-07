@@ -616,13 +616,13 @@ export default function LandingPage() {
             <div className="footer-column">
               <h4>Company</h4>
               <button className="footer-link unstyled" onClick={() => scrollToSection("contact")}>Contact</button>
-              <a href="#">About us</a>
-              <a href="#">Careers</a>
+              <span className="footer-link-placeholder">About us</span>
+              <span className="footer-link-placeholder">Careers</span>
             </div>
             <div className="footer-column">
               <h4>Legal</h4>
-              <a href="#">Privacy Policy</a>
-              <a href="#">Terms of Service</a>
+              <Link to="/privacy">Privacy Policy</Link>
+              <Link to="/terms">Terms of Service</Link>
             </div>
           </div>
         </div>

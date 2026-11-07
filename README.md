@@ -7,6 +7,7 @@ A full-stack Recruitment Referral Management System built with React, Express, M
 - **Candidate Portal**: Browse jobs, submit referrals, track applications
 - **HR Admin Portal**: Manage jobs, review applications, update statuses
 - **Super Admin Portal**: Manage HR admins, activate/deactivate accounts
+- **Pre-Onboarding Checklist**: Track candidate engagement activities before joining (NEW!)
 - **Real-time Notifications**: Application status updates
 - **Resume Upload**: PDF, DOC, DOCX support (max 5MB)
 
@@ -100,6 +101,13 @@ A full-stack Recruitment Referral Management System built with React, Express, M
 - For Vercel, the `vercel.json` handles SPA routing
 - Resume uploads are stored in `server/src/uploads/`
 
+## Future Considerations
+
+- **API Versioning**: Consider adding `/api/v1/` prefix for major version bumps
+- **Email Service**: Integrate SendGrid/Mailgun for password reset emails
+- **File Storage**: Move resume uploads to S3/Cloudinary for production scale
+- **Caching**: Add Redis for session management and API caching
+
 ## API Endpoints
 
 ### Authentication
@@ -130,6 +138,17 @@ A full-stack Recruitment Referral Management System built with React, Express, M
 - `GET /api/notifications` - List notifications
 - `PATCH /api/notifications/mark-all-read` - Mark all read
 - `DELETE /api/notifications/clear-all` - Clear all
+
+### Pre-Onboarding (Admin)
+- `GET /api/pre-onboarding` - List all pre-onboardings
+- `GET /api/pre-onboarding/dashboard` - Pre-onboarding dashboard stats
+- `GET /api/pre-onboarding/export` - Export pre-onboarding data
+- `POST /api/pre-onboarding/application/:applicationId` - Create pre-onboarding for application
+- `GET /api/pre-onboarding/application/:applicationId` - Get pre-onboarding by application
+- `GET /api/pre-onboarding/:id` - Get pre-onboarding details
+- `PATCH /api/pre-onboarding/:id` - Update pre-onboarding
+- `POST /api/pre-onboarding/:id/activities` - Add activity to checklist
+- `PATCH /api/pre-onboarding/:id/activities/:activityId` - Update activity status
 
 ### User Management (Super Admin)
 - `GET /api/users` - List HR admins

@@ -98,6 +98,17 @@ const adminNav = [
     )
   },
   { 
+    to: "/admin/pre-onboarding", 
+    label: "Pre-Onboarding",
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+        <circle cx="8.5" cy="7" r="4" />
+        <polyline points="17 11 19 13 23 9" />
+      </svg>
+    )
+  },
+  { 
     to: "/admin/notifications", 
     label: "Notifications",
     icon: (
@@ -395,7 +406,13 @@ export default function AppLayout() {
     return "Dashboard";
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      // Invalidate token on server (adds to blacklist)
+      await api.post("/auth/logout");
+    } catch (e) {
+      // Proceed with logout even if server call fails
+    }
     logout();
     nav("/login", { replace: true });
   };
@@ -425,6 +442,19 @@ export default function AppLayout() {
               i<span>Space</span>
             </span>
           </div>
+          {/* Hamburger button to collapse sidebar on desktop */}
+          <button
+            type="button"
+            className="sidebar-collapse-btn unstyled"
+            aria-label="Toggle sidebar"
+            onClick={() => setCollapsed(!collapsed)}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="3" y1="12" x2="21" y2="12" />
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <line x1="3" y1="18" x2="21" y2="18" />
+            </svg>
+          </button>
           <RoleBadge role={user.role} />
         </div>
 
@@ -447,7 +477,10 @@ export default function AppLayout() {
                   <span className="nav-badge-dot" />
                 )}
               </span>
-              <span className="nav-label">{item.label}</span>
+              <span className="nav-label">
+                {item.label}
+                {item.isNew && <span className="nav-new-badge">NEW</span>}
+              </span>
               <span className="nav-indicator" />
             </NavLink>
           ))}

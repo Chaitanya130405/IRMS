@@ -1,6 +1,7 @@
 import Application from "../models/Application.js";
 import Job from "../models/Job.js";
 import Notification from "../models/Notification.js";
+import User from "../models/User.js";
 import asyncHandler from "../utils/asyncHandler.js";
 export const dashboard = asyncHandler(async (req, res) => {
   const isAdmin = req.user.role === "admin";
@@ -36,9 +37,7 @@ export const dashboard = asyncHandler(async (req, res) => {
     notifications,
   };
   if (isAdmin) {
-    data.totalCandidates = await (
-      await import("../models/User.js")
-    ).default.countDocuments({ role: "candidate" });
+    data.totalCandidates = await User.countDocuments({ role: "candidate" });
     data.activeJobs = await Job.countDocuments({ status: "active" });
     data.today = await Application.countDocuments({
       createdAt: { $gte: new Date(new Date().setHours(0, 0, 0, 0)) },

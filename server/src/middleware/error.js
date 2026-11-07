@@ -1,7 +1,15 @@
 export const notFound = (req, res) =>
   res.status(404).json({ message: `Route not found: ${req.originalUrl}` });
 export const errorHandler = (err, req, res, next) => {
-  console.error(err);
+  // Log errors in development only (avoid leaking sensitive info in production)
+  if (process.env.NODE_ENV !== "production") {
+    console.error("[Error]", {
+      message: err.message,
+      stack: err.stack,
+      path: req.path,
+      method: req.method,
+    });
+  }
   if (err?.name === "CastError") {
     return res.status(400).json({ message: "Invalid resource identifier" });
   }

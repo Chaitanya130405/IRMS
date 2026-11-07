@@ -5,6 +5,7 @@ import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AppLayout from "./layouts/AppLayout";
 import { Login, Register, Forgot, ResetPassword } from "./pages/AuthPages";
+import { TermsOfService, PrivacyPolicy } from "./pages/LegalPages";
 import LandingPage from "./pages/LandingPage";
 import {
   Dashboard,
@@ -20,7 +21,9 @@ import {
   CreateAdmin,
   Candidates,
 } from "./pages/AppPages";
+import { PreOnboardingList, PreOnboardingDetail } from "./pages/PreOnboardingPages";
 import "./styles/app.css";
+import "./styles/pre-onboarding.css";
 
 const Candidate = () => (
   <ProtectedRoute role="candidate">
@@ -50,6 +53,8 @@ createRoot(document.getElementById("root")).render(
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<Forgot />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
+          <Route path="/terms" element={<TermsOfService />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route element={<Candidate />}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/jobs" element={<Jobs />} />
@@ -71,6 +76,9 @@ createRoot(document.getElementById("root")).render(
               path="/admin/applications/:id"
               element={<ApplicationDetails />}
             />
+            {/* Pre-Onboarding Routes */}
+            <Route path="/admin/pre-onboarding" element={<PreOnboardingList />} />
+            <Route path="/admin/pre-onboarding/:id" element={<PreOnboardingDetail />} />
             <Route path="/admin/insights/candidates" element={<Candidates />} />
             <Route
               path="/admin/insights/applications"

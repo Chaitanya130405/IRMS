@@ -9,6 +9,7 @@ import path from "path";
 import authRoutes from "./routes/authRoutes.js";
 import jobRoutes from "./routes/jobRoutes.js";
 import applicationRoutes from "./routes/applicationRoutes.js";
+import preOnboardingRoutes from "./routes/preOnboardingRoutes.js";
 import miscRoutes from "./routes/miscRoutes.js";
 
 import { notFound, errorHandler } from "./middleware/error.js";
@@ -20,6 +21,13 @@ const allowedOrigins = process.env.CLIENT_URL
   : [];
 
 app.use(helmet({ crossOriginResourcePolicy: false }));
+
+// Add request ID for debugging
+app.use((req, res, next) => {
+  req.requestId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  res.setHeader("X-Request-ID", req.requestId);
+  next();
+});
 
 app.use(
   cors({
@@ -68,6 +76,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/jobs", jobRoutes);
 
 app.use("/api/applications", applicationRoutes);
+
+app.use("/api/pre-onboarding", preOnboardingRoutes);
 
 app.use("/api", miscRoutes);
 

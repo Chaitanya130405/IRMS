@@ -21,7 +21,7 @@ const downloadCsv = (filename, headers, rows) => {
   URL.revokeObjectURL(url);
 };
 
-const PAGE_SIZE = 6;
+const PAGE_SIZE = 10;
 
 // ═══════════════════════════════════════════════════════════════════════════
 // ICONS
@@ -390,14 +390,6 @@ export function Dashboard({ admin = false }) {
 
   return (
     <div className="page-container">
-      <div className="dashboard-welcome">
-        <h1>Welcome back, {user.name.split(" ")[0]}</h1>
-        <p>{admin ? "Here's your recruitment overview" : "Track your job applications"}</p>
-        <span className="dashboard-date">
-          {new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}
-        </span>
-      </div>
-
       <div className={`stats-grid ${!admin ? 'stats-4' : ''}`}>
         {stats.map((s) => (
           <div key={s.label} className={`stat-card stat-${s.color}`}>
