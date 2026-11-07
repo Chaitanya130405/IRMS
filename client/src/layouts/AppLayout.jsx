@@ -194,7 +194,6 @@ function UserCard({ user }) {
         ) : (
           <span>{user.name.charAt(0)}</span>
         )}
-        <span className="avatar-status" />
       </div>
       <div className="user-info">
         <p className="user-name">{user.name}</p>
@@ -499,8 +498,7 @@ export default function AppLayout() {
           <span>Sign out</span>
         </button>
 
-        {/* Sidebar decoration */}
-        <div className="sidebar-decoration" />
+
       </aside>
 
       {/* Mobile menu trigger */}

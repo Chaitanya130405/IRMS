@@ -185,7 +185,6 @@ function StatusBadge({ status, size = "md" }) {
       className={`status-badge-po ${size}`}
       style={{ backgroundColor: style.bg, color: style.text }}
     >
-      <span className="status-dot" style={{ backgroundColor: style.dot }} />
       {status}
     </span>
   );

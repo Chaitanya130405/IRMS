@@ -5948,3 +5948,370 @@ body {
     display: none;
   }
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   FIX: Remove bar above logout in collapsed sidebar
+   ═══════════════════════════════════════════════════════════════════════════ */
+.sidebar-collapsed .app-sidebar .sidebar-logout {
+  border: none !important;
+  background: transparent !important;
+  margin-top: 0 !important;
+}
+
+.sidebar-collapsed .app-sidebar .sidebar-logout:hover {
+  background: rgba(248, 113, 113, 0.1) !important;
+}
+
+
+/* FIX: Remove gap between nav and logout in collapsed sidebar */
+.sidebar-collapsed .app-sidebar .app-nav {
+  flex: none;
+  padding-bottom: 8px;
+}
+
+.sidebar-collapsed .app-sidebar .sidebar-logout {
+  margin-top: auto;
+}
+
+
+/* Better fix: Remove visible gap in collapsed sidebar */
+.sidebar-collapsed .app-sidebar {
+  justify-content: flex-start;
+}
+
+.sidebar-collapsed .app-sidebar .app-nav {
+  flex: 0 0 auto;
+  margin-bottom: auto;
+}
+
+
+/* FINAL FIX: Collapsed sidebar - no gap before logout */
+.sidebar-collapsed .app-sidebar .sidebar-logout {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0 !important;
+}
+
+
+/* Hide scrollbar completely in collapsed sidebar */
+.sidebar-collapsed .app-sidebar .app-nav::-webkit-scrollbar {
+  display: none;
+  width: 0;
+}
+
+.sidebar-collapsed .app-sidebar .app-nav {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  overflow: hidden;
+}
+
+
+/* NUCLEAR FIX: Force hide any bar between nav and logout in collapsed state */
+.sidebar-collapsed .app-sidebar > *:not(.sidebar-header):not(.sidebar-user-card):not(.app-nav):not(.sidebar-logout):not(.sidebar-close):not(.sidebar-collapse-btn) {
+  display: none !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  visibility: hidden !important;
+}
+
+/* Ensure no gap between nav and logout */
+.sidebar-collapsed .app-sidebar {
+  gap: 0 !important;
+}
+
+.sidebar-collapsed .app-sidebar .app-nav {
+  margin-bottom: 0 !important;
+  padding-bottom: 8px !important;
+}
+
+.sidebar-collapsed .app-sidebar .sidebar-logout {
+  margin-top: 0 !important;
+}
+
+
+/* Hide avatar status circle */
+.avatar-status {
+  display: none !important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   RESPONSIVE FIXES - All Screen Sizes
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Extra small phones (320px - 375px) */
+@media (max-width: 375px) {
+  .app-content {
+    padding: 8px;
+  }
+
+  .card {
+    padding: 12px;
+  }
+
+  .page-header h1 {
+    font-size: 18px;
+  }
+
+  .stat-card {
+    padding: 12px;
+  }
+
+  .stat-card-value {
+    font-size: 20px;
+  }
+
+  .btn {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+
+  .form-input,
+  .form-select,
+  .form-textarea {
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+
+  .data-table th,
+  .data-table td {
+    padding: 8px 10px;
+    font-size: 11px;
+  }
+
+  .header-greeting {
+    font-size: 14px;
+  }
+
+  .header-breadcrumb {
+    font-size: 10px;
+  }
+}
+
+/* Small phones (376px - 480px) */
+@media (min-width: 376px) and (max-width: 480px) {
+  .page-header h1 {
+    font-size: 20px;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+}
+
+/* Tablets portrait (481px - 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .jobs-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .detail-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Tablets landscape and small laptops (769px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .app-main {
+    margin-left: 0;
+  }
+
+  .jobs-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Large screens (1025px - 1440px) */
+@media (min-width: 1025px) and (max-width: 1440px) {
+  .jobs-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Extra large screens (1441px+) */
+@media (min-width: 1441px) {
+  .app-content {
+    max-width: 1600px;
+    margin: 0 auto;
+  }
+
+  .jobs-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Ensure tables are scrollable on mobile */
+@media (max-width: 768px) {
+  .data-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .data-table {
+    min-width: 600px;
+  }
+
+  /* Hide less important columns on mobile */
+  .data-table .hide-mobile {
+    display: none;
+  }
+}
+
+/* Fix header on mobile */
+@media (max-width: 640px) {
+  .app-header {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .header-left {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .header-content {
+    min-width: 0;
+  }
+
+  .header-greeting {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .header-actions {
+    gap: 8px;
+  }
+
+  .header-icon-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .header-profile {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+/* Modal responsiveness */
+@media (max-width: 480px) {
+  .modal-content {
+    width: 95%;
+    max-width: none;
+    margin: 16px;
+    padding: 16px;
+  }
+
+  .modal-content h3 {
+    font-size: 16px;
+  }
+}
+
+/* Auth pages full responsiveness */
+@media (max-width: 480px) {
+  .auth-page .card {
+    padding: 20px 16px;
+    margin: 0 8px;
+  }
+
+  .auth-page h1 {
+    font-size: 22px;
+  }
+
+  .auth-page .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Pre-onboarding responsive fixes */
+@media (max-width: 640px) {
+  .po-candidate-card {
+    padding: 16px;
+  }
+
+  .po-candidate-info {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .po-candidate-meta {
+    justify-content: center;
+  }
+
+  .po-tabs {
+    overflow-x: auto;
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .po-tab {
+    flex-shrink: 0;
+    padding: 8px 16px;
+    font-size: 11px;
+  }
+
+  .po-activities-table {
+    font-size: 11px;
+  }
+}
+
+/* Collapsed sidebar on mobile - ensure it expands */
+@media (max-width: 1023px) {
+  .sidebar-collapsed .app-sidebar {
+    width: 260px;
+  }
+
+  .sidebar-collapsed .app-sidebar .nav-label,
+  .sidebar-collapsed .app-sidebar .user-info,
+  .sidebar-collapsed .app-sidebar .role-badge,
+  .sidebar-collapsed .app-sidebar .brand-text,
+  .sidebar-collapsed .app-sidebar .sidebar-logout span {
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  .sidebar-collapsed .app-main {
+    margin-left: 0;
+  }
+}
+
+/* Touch-friendly buttons on mobile */
+@media (max-width: 768px) {
+  .btn,
+  .nav-link,
+  .pagination-btn {
+    min-height: 44px;
+  }
+
+  .btn-sm {
+    min-height: 36px;
+  }
+}
+
+/* Improve readability on all screens */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Safe area support for notched phones */
+@supports (padding: max(0px)) {
+  .app-sidebar {
+    padding-bottom: max(24px, env(safe-area-inset-bottom));
+  }
+
+  .app-content {
+    padding-bottom: max(20px, env(safe-area-inset-bottom));
+  }
+}
