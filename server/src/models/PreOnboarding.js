@@ -76,6 +76,12 @@ const preOnboardingSchema = new mongoose.Schema(
     remarks: String,
     droppedReason: String,
     droppedAt: Date,
+    // Reporting Manager for notifications
+    reportingManagerEmail: String,
+    reportingManagerName: String,
+    // Reminder tracking
+    reminderSent: { type: Boolean, default: false },
+    reminderSentAt: Date,
   },
   { timestamps: true }
 );

@@ -586,6 +586,11 @@ export function PreOnboardingDetail() {
             <label>Owner</label>
             <span>{data.assignedTo?.name || "Hiring Team"}</span>
           </div>
+          <div className="meta-item">
+            <label>Reporting Manager</label>
+            <span>{data.reportingManagerName || "—"}</span>
+            {data.reportingManagerEmail && <small>{data.reportingManagerEmail}</small>}
+          </div>
         </div>
         <div className="po-status-dropdown">
           <select
@@ -948,6 +953,8 @@ export function StartPreOnboarding({ applicationId, onSuccess }) {
     isCriticalHire: true,
     expectedJoiningDate: "",
     engagementStartDate: new Date().toISOString().split("T")[0],
+    reportingManagerEmail: "",
+    reportingManagerName: "",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -999,6 +1006,29 @@ export function StartPreOnboarding({ applicationId, onSuccess }) {
           value={form.engagementStartDate}
           onChange={(e) => setForm({ ...form, engagementStartDate: e.target.value })}
         />
+      </div>
+
+      <div className="form-row">
+        <div className="form-group">
+          <label className="form-label">Reporting Manager Name</label>
+          <input
+            className="form-input"
+            value={form.reportingManagerName}
+            onChange={(e) => setForm({ ...form, reportingManagerName: e.target.value })}
+            placeholder="Enter manager name"
+          />
+        </div>
+        <div className="form-group">
+          <label className="form-label">Reporting Manager Email</label>
+          <input
+            className="form-input"
+            type="email"
+            value={form.reportingManagerEmail}
+            onChange={(e) => setForm({ ...form, reportingManagerEmail: e.target.value })}
+            placeholder="manager@company.com"
+          />
+          <small className="form-hint">Email notification will be sent when joining date is set</small>
+        </div>
       </div>
 
       <div className="form-group">

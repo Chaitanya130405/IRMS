@@ -3,6 +3,7 @@ import Application from "../models/Application.js";
 import AppError from "../utils/AppError.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import { notify } from "../services/notificationService.js";
+import { sendJoiningDateNotification } from "../services/emailService.js";
 
 // Helper to populate pre-onboarding data
 const populatePreOnboarding = (query) =>
@@ -15,7 +16,15 @@ const populatePreOnboarding = (query) =>
 // Create pre-onboarding for a selected candidate
 export const createPreOnboarding = asyncHandler(async (req, res) => {
   const { applicationId } = req.params;
-  const { clientName, isCriticalHire, expectedJoiningDate, engagementStartDate, assignedTo } = req.body;
+  const { 
+    clientName, 
+    isCriticalHire, 
+    expectedJoiningDate, 
+    engagementStartDate, 
+    assignedTo,
+    reportingManagerEmail,
+    reportingManagerName,
+  } = req.body;
 
   // Check if application exists and is in Selected/Offer Released status
   const application = await Application.findById(applicationId).populate("candidate job");
@@ -48,6 +57,8 @@ export const createPreOnboarding = asyncHandler(async (req, res) => {
     assignedTo: assignedTo || req.user.id,
     overallStatus: "In Progress",
     activities: defaultActivities,
+    reportingManagerEmail,
+    reportingManagerName,
     history: [
       {
         action: "Pre-onboarding checklist created",
@@ -62,6 +73,18 @@ export const createPreOnboarding = asyncHandler(async (req, res) => {
     "Pre-onboarding started",
     "Your pre-onboarding process has begun. We're excited to have you join us!"
   );
+
+  // Send email to reporting manager if joining date is set
+  if (expectedJoiningDate && reportingManagerEmail) {
+    await sendJoiningDateNotification({
+      reportingManagerEmail,
+      reportingManagerName,
+      candidateName: application.candidate.name,
+      jobTitle: application.job.title,
+      joiningDate: expectedJoiningDate,
+      isUpdate: false,
+    });
+  }
 
   const populated = await populatePreOnboarding(PreOnboarding.findById(preOnboarding._id));
   res.status(201).json({ preOnboarding: populated });
@@ -198,16 +221,27 @@ export const getPreOnboardingByApplication = asyncHandler(async (req, res) => {
 
 // Update pre-onboarding details
 export const updatePreOnboarding = asyncHandler(async (req, res) => {
-  const { clientName, isCriticalHire, expectedJoiningDate, engagementStartDate, assignedTo, overallStatus, remarks } =
-    req.body;
+  const { 
+    clientName, 
+    isCriticalHire, 
+    expectedJoiningDate, 
+    engagementStartDate, 
+    assignedTo, 
+    overallStatus, 
+    remarks,
+    reportingManagerEmail,
+    reportingManagerName,
+  } = req.body;
 
-  const preOnboarding = await PreOnboarding.findById(req.params.id);
+  const preOnboarding = await PreOnboarding.findById(req.params.id).populate("candidate job");
   if (!preOnboarding) {
     throw new AppError("Pre-onboarding not found", 404);
   }
 
   // Track changes for history
   const changes = [];
+  let joiningDateChanged = false;
+  const previousJoiningDate = preOnboarding.expectedJoiningDate;
 
   if (clientName !== undefined && clientName !== preOnboarding.clientName) {
     changes.push(`Client name updated to "${clientName}"`);
@@ -220,8 +254,16 @@ export const updatePreOnboarding = asyncHandler(async (req, res) => {
   }
 
   if (expectedJoiningDate !== undefined) {
-    changes.push(`Expected joining date updated`);
-    preOnboarding.expectedJoiningDate = expectedJoiningDate;
+    const newDate = new Date(expectedJoiningDate).toISOString().split("T")[0];
+    const oldDate = previousJoiningDate ? new Date(previousJoiningDate).toISOString().split("T")[0] : null;
+    
+    if (newDate !== oldDate) {
+      joiningDateChanged = true;
+      changes.push(`Expected joining date updated`);
+      preOnboarding.expectedJoiningDate = expectedJoiningDate;
+      // Reset reminder flag when date changes
+      preOnboarding.reminderSent = false;
+    }
   }
 
   if (engagementStartDate !== undefined) {
@@ -248,6 +290,14 @@ export const updatePreOnboarding = asyncHandler(async (req, res) => {
     preOnboarding.remarks = remarks;
   }
 
+  // Update reporting manager info
+  if (reportingManagerEmail !== undefined) {
+    preOnboarding.reportingManagerEmail = reportingManagerEmail;
+  }
+  if (reportingManagerName !== undefined) {
+    preOnboarding.reportingManagerName = reportingManagerName;
+  }
+
   // Add history entry
   if (changes.length > 0) {
     preOnboarding.history.push({
@@ -257,6 +307,19 @@ export const updatePreOnboarding = asyncHandler(async (req, res) => {
   }
 
   await preOnboarding.save();
+
+  // Send email to reporting manager if joining date changed
+  const managerEmail = reportingManagerEmail || preOnboarding.reportingManagerEmail;
+  if (joiningDateChanged && managerEmail) {
+    await sendJoiningDateNotification({
+      reportingManagerEmail: managerEmail,
+      reportingManagerName: reportingManagerName || preOnboarding.reportingManagerName,
+      candidateName: preOnboarding.candidate?.name || "Candidate",
+      jobTitle: preOnboarding.job?.title || "N/A",
+      joiningDate: expectedJoiningDate,
+      isUpdate: !!previousJoiningDate,
+    });
+  }
 
   const populated = await populatePreOnboarding(PreOnboarding.findById(preOnboarding._id));
   res.json({
@@ -458,6 +521,7 @@ export const exportPreOnboardings = asyncHandler(async (req, res) => {
       progress: `${stats.completed}/${stats.total} (${stats.progressPercent}%)`,
       atRiskActivities: stats.atRisk,
       assignedTo: po.assignedTo?.name || "N/A",
+      reportingManagerEmail: po.reportingManagerEmail || "N/A",
       createdAt: po.createdAt.toISOString().split("T")[0],
     };
   });

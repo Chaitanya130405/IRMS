@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import api from "../services/api";
 import { useAuth } from "../context/AuthContext";
+import { StartPreOnboarding } from "./PreOnboardingPages";
 
 // ═══════════════════════════════════════════════════════════════════════════
 // UTILITY FUNCTIONS
@@ -1243,6 +1244,8 @@ export function ApplicationDetails() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [showWithdrawConfirm, setShowWithdrawConfirm] = useState(false);
+  const [showPreOnboarding, setShowPreOnboarding] = useState(false);
+  const [existingPreOnboarding, setExistingPreOnboarding] = useState(null);
 
   const handleWithdraw = async () => {
     setSaving(true);
@@ -1371,6 +1374,16 @@ export function ApplicationDetails() {
                 <button className="btn btn-primary" onClick={updateStatus} disabled={saving}>
                   {saving ? "Saving..." : "Update Status"}
                 </button>
+                
+                {["Selected", "Offer Released"].includes(app.status) && (
+                  <button 
+                    className="btn btn-outline" 
+                    style={{ width: '100%', marginTop: '12px' }}
+                    onClick={() => setShowPreOnboarding(true)}
+                  >
+                    Start Pre-Onboarding
+                  </button>
+                )}
               </div>
             </Card>
           )}
@@ -1404,6 +1417,27 @@ export function ApplicationDetails() {
             onConfirm={handleWithdraw}
             onCancel={() => setShowWithdrawConfirm(false)}
           />
+
+          {showPreOnboarding && (
+            <div className="modal-backdrop" onClick={() => setShowPreOnboarding(false)}>
+              <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '500px' }}>
+                <StartPreOnboarding 
+                  applicationId={app._id} 
+                  onSuccess={() => {
+                    setShowPreOnboarding(false);
+                    nav('/admin/pre-onboarding');
+                  }} 
+                />
+                <button 
+                  className="btn btn-outline" 
+                  style={{ width: '100%', marginTop: '12px' }}
+                  onClick={() => setShowPreOnboarding(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
 
           <Card>
             <div className="card-header"><h3>Status History</h3></div>

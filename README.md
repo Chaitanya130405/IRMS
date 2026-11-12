@@ -7,7 +7,10 @@ A full-stack Recruitment Referral Management System built with React, Express, M
 - **Candidate Portal**: Browse jobs, submit referrals, track applications
 - **HR Admin Portal**: Manage jobs, review applications, update statuses
 - **Super Admin Portal**: Manage HR admins, activate/deactivate accounts
-- **Pre-Onboarding Checklist**: Track candidate engagement activities before joining (NEW!)
+- **Pre-Onboarding Checklist**: Track candidate engagement activities before joining
+- **Automated Email Notifications**: 
+  - Notify reporting manager when joining date is set/updated
+  - 2-day advance reminder to IT/Admin teams for new joiners
 - **Real-time Notifications**: Application status updates
 - **Resume Upload**: PDF, DOC, DOCX support (max 5MB)
 
